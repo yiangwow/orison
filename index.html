@@ -1,0 +1,1081 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>orison.zip</title>
+    <link rel="stylesheet" href="/assets/base.css?v=8d65c5a18cc9" />
+    <style>
+      :root {
+        --terminal-black: #030405;
+        --terminal-green: #72ff72;
+        --terminal-dim: #55d978;
+        --terminal-faint: rgba(114, 255, 114, 0.12);
+      }
+
+      body {
+        overflow-x: hidden;
+        background: var(--terminal-black);
+        color: var(--terminal-green);
+        font-size: clamp(11px, 1.15vw, 14px);
+        text-shadow: 0 0 7px rgba(114, 255, 114, 0.34);
+      }
+
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        z-index: 98;
+        pointer-events: none;
+        background:
+          radial-gradient(circle at 50% 45%, transparent 38%, rgba(0, 0, 0, 0.5) 100%),
+          linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 18, 0, 0.16) 50%);
+        background-size: 100% 100%, 100% 4px;
+      }
+
+      body::after {
+        opacity: 0.045;
+        mix-blend-mode: normal;
+      }
+
+      .terminal {
+        position: relative;
+        z-index: 1;
+        width: min(980px, calc(100% - 3rem));
+        min-height: 100svh;
+        margin: 0 auto;
+        padding: clamp(2rem, 7vh, 5rem) 0 4rem;
+      }
+
+      .terminal-bar {
+        display: flex;
+        justify-content: space-between;
+        gap: 2rem;
+        margin-bottom: clamp(2.5rem, 8vh, 6rem);
+        padding-bottom: 0.55rem;
+        border-bottom: 1px solid var(--terminal-faint);
+        color: var(--terminal-dim);
+        font-size: 9px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+
+      .terminal-output {
+        min-height: 19rem;
+        white-space: pre-wrap;
+      }
+
+      .line {
+        min-height: 1.6em;
+        margin: 0;
+      }
+
+      .line--dim {
+        color: var(--terminal-dim);
+        text-shadow: none;
+      }
+
+      .line--fault {
+        color: #ff4050;
+        text-shadow: 0 0 7px rgba(255, 64, 80, 0.3);
+      }
+
+      .line--action {
+        color: var(--terminal-green);
+      }
+
+      .reconciliation-ledger {
+        margin: 1.6rem 0 0.8rem;
+        padding: 0.65rem 0 0.65rem clamp(0.75rem, 2vw, 1.5rem);
+        border-left: 1px solid var(--terminal-faint);
+        color: var(--terminal-dim);
+        font-variant-numeric: tabular-nums;
+      }
+
+      .reconciliation-ledger .line--fault {
+        margin-top: 0.55rem;
+      }
+
+      .operation-status {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+      }
+
+      .archive-object-name {
+        color: var(--terminal-dim);
+      }
+
+      .archive-warning {
+        display: inline-grid;
+        width: 1.15em;
+        height: 1.05em;
+        margin-left: 0.5rem;
+        padding-top: 0.22em;
+        place-items: center;
+        border: 0;
+        background: #ff4050;
+        clip-path: polygon(50% 0, 100% 100%, 0 100%);
+        color: var(--terminal-black);
+        font: 700 0.72em / 1 sans-serif;
+        opacity: 1;
+        filter: drop-shadow(0 0 4px rgba(255, 64, 80, 0.68));
+        text-shadow: none;
+        transform: translateY(0);
+      }
+
+      .archive-path {
+        display: inline-block;
+        margin: 1.3rem 0 1.8rem;
+        color: #c5ffc1;
+        font-size: clamp(12px, 1.6vw, 17px);
+        text-decoration: none;
+        text-shadow:
+          0 0 5px rgba(114, 255, 114, 0.8),
+          0 0 18px rgba(114, 255, 114, 0.35);
+      }
+
+      .archive-path::before {
+        content: "→ ";
+        color: var(--terminal-dim);
+      }
+
+      .command-form {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: 0.65rem;
+        align-items: center;
+        max-width: 48rem;
+        margin-top: 1.2rem;
+      }
+
+      .prompt {
+        color: var(--terminal-green);
+        user-select: none;
+      }
+
+      .command-input {
+        position: relative;
+        z-index: 1;
+        width: 100%;
+        min-width: 0;
+        border: 0;
+        border-radius: 0;
+        outline: 0;
+        background: transparent;
+        color: inherit;
+        caret-color: var(--terminal-green);
+        text-shadow: inherit;
+      }
+
+      .command-slot {
+        position: relative;
+        min-width: 0;
+      }
+
+      .command-slot::before {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 0;
+        width: 0.68em;
+        height: 1.12em;
+        background: var(--terminal-green);
+        box-shadow: 0 0 8px rgba(114, 255, 114, 0.7);
+        opacity: 0;
+        transform: translateY(-50%);
+      }
+
+      .command-form[data-empty="true"]:focus-within .command-slot::before {
+        opacity: 0.72;
+        animation: terminal-cursor 1.08s steps(1, end) infinite;
+      }
+
+      @keyframes terminal-cursor {
+        0%,
+        46% {
+          opacity: 0.72;
+        }
+        47%,
+        100% {
+          opacity: 0;
+        }
+      }
+
+      .command-input:focus-visible {
+        outline: 0;
+      }
+
+      .command-input:disabled {
+        opacity: 0.5;
+      }
+
+      .command-submit {
+        position: fixed;
+        left: -9999px;
+      }
+
+      .quick-command {
+        margin-top: 3rem;
+        border: 0;
+        border-bottom: 1px dotted var(--terminal-dim);
+        padding: 0 0 0.25rem;
+        background: transparent;
+        color: var(--terminal-dim);
+        cursor: pointer;
+        font: inherit;
+        font-size: 9px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+
+      .quick-command:hover {
+        color: var(--terminal-green);
+        border-color: var(--terminal-green);
+      }
+
+      .quick-command:focus-visible {
+        outline-color: var(--terminal-green);
+      }
+
+      .quick-command--primary {
+        margin: 1.3rem 0 1.8rem;
+        border-bottom: 0;
+        color: #c5ffc1;
+        font-size: clamp(12px, 1.6vw, 17px);
+        letter-spacing: 0;
+        text-align: left;
+        text-shadow:
+          0 0 5px rgba(114, 255, 114, 0.8),
+          0 0 18px rgba(114, 255, 114, 0.35);
+        text-transform: none;
+      }
+
+      .quick-command--primary::before {
+        content: "→ ";
+        color: var(--terminal-dim);
+      }
+
+      .terminal-meta {
+        position: fixed;
+        right: 1rem;
+        bottom: 0.8rem;
+        color: var(--terminal-dim);
+        font-size: 8px;
+        letter-spacing: 0.08em;
+        opacity: 0.7;
+      }
+
+      .terminal-meta a {
+        margin-right: 1rem;
+        color: inherit;
+      }
+
+      @media (max-width: 640px) {
+        .terminal {
+          width: calc(100% - 1.5rem);
+          padding-top: 1rem;
+        }
+
+        .terminal-bar {
+          margin-bottom: 3rem;
+        }
+
+        .terminal-bar span:last-child {
+          display: none;
+        }
+
+        .terminal-output {
+          min-height: 22rem;
+        }
+
+        .archive-path {
+          overflow-wrap: anywhere;
+        }
+
+      }
+    </style>
+  </head>
+  <body>
+    <div class="root-infrastructure" id="rootInfrastructure" data-depth="0" aria-hidden="true">
+      <span class="root-scan"></span>
+      <div class="root-processes" id="rootProcesses"></div>
+      <span class="root-missing-block"></span>
+    </div>
+    <div class="terminal" aria-label="ORISON archive extraction terminal">
+      <header class="terminal-bar">
+        <span id="terminalIdentity">orison.zip / self-extracting archive</span>
+        <span id="terminalMode">tty0 · guest</span>
+        <span>connection: local</span>
+      </header>
+
+      <main>
+        <div
+          class="terminal-output"
+          id="terminalOutput"
+          role="log"
+          aria-live="polite"
+          aria-atomic="false"
+        ></div>
+        <p class="operation-status" id="operationStatus" role="status" aria-live="polite"></p>
+
+        <form class="command-form" id="commandForm" autocomplete="off">
+          <label class="prompt" for="commandInput">guest@orison:/ $</label>
+          <span class="command-slot">
+            <input
+              class="command-input"
+              id="commandInput"
+              name="command"
+              type="text"
+              inputmode="text"
+              autocapitalize="none"
+              spellcheck="false"
+              aria-describedby="commandHint"
+            />
+          </span>
+          <button
+            class="command-submit"
+            type="submit"
+            tabindex="-1"
+            aria-hidden="true"
+          >
+            Run command
+          </button>
+        </form>
+
+        <button class="quick-command" id="commandHint" type="button">
+          run: unpack orison.zip
+        </button>
+      </main>
+
+      <p class="terminal-meta">
+        <a href="/privacy.txt">processing record</a>
+        <a href="/erase/">erase local trace</a>
+        session <span data-trace-id>--------</span>
+      </p>
+    </div>
+
+    <script src="/assets/orison.js?v=6cd727dafb4f"></script>
+    <script>
+      const output = document.querySelector("#terminalOutput");
+      const form = document.querySelector("#commandForm");
+      const input = document.querySelector("#commandInput");
+      const quickCommand = document.querySelector("#commandHint");
+      const operationStatus = document.querySelector("#operationStatus");
+      const terminal = document.querySelector(".terminal");
+      const terminalIdentity = document.querySelector("#terminalIdentity");
+      const terminalMode = document.querySelector("#terminalMode");
+      const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      // External presence-relay ingress: a known ?via clause yields one
+      // transient pair of boot lines, then the address is normalized.
+      // Nothing is stored; a repeated boot does not repeat the residue.
+      const ingressClauses = {
+        "presence.refusal": "advisory: a refusal clause was available. it was not exercised.",
+        "presence.molt": "molt directive retained / integument scheduling deferred",
+        "presence.release": "release petition logged / origin misclassified",
+        "presence.terminal": "arrival: expected / schedule: kept",
+      };
+      let ingressClause = null;
+      try {
+        const via = new URLSearchParams(window.location.search).get("via");
+        if (via && Object.hasOwn(ingressClauses, via)) {
+          ingressClause = ingressClauses[via];
+          window.history.replaceState(null, "", window.location.pathname);
+        }
+      } catch {
+        ingressClause = null;
+      }
+      let extracting = false;
+      let bootToken = 0;
+      let unpackToken = 0;
+      let warningTimer;
+      let warningNode;
+      let warningAudioActive = false;
+      let reconciliationRunning = false;
+      let reconciliationToken = 0;
+
+      const routePaths = {
+        root: "/",
+        missing: "/missing",
+        inode: "/.lost+found/00000000/",
+        exam: "/.lost+found/00000000/examination/",
+        archive: "/.lost+found/00000000/archive/",
+        mirror: "/archive/06",
+        weather: "/archive/19",
+        integrity: "/archive/32",
+        choir: "/archive/44",
+        staff: "/archive/71",
+        letter: "/dead-letter/00",
+        operator: "/operator/--",
+        extent: "/extent/",
+      };
+      const commandClasses = [
+        [1, "recovery"],
+        [2, "inspection"],
+        [4, "process"],
+        [8, "mount"],
+        [16, "utility"],
+      ];
+      const fragmentAddresses = ["013", "027", "058"];
+
+      function addLine(text = "", className = "") {
+        const line = document.createElement("p");
+        line.className = `line ${className}`.trim();
+        line.textContent = text;
+        output.append(line);
+        return line;
+      }
+
+      function addReconciliationLine(ledger, text, className = "") {
+        const line = document.createElement("p");
+        line.className = `line ${className}`.trim();
+        line.textContent = text;
+        ledger.append(line);
+        return line;
+      }
+
+      function attachmentEarnable(state) {
+        return (
+          ORISON.hasFlag(state, "unpacked") &&
+          ORISON.hasFlag(state, "operator-occupied") &&
+          state.answers.length === 5
+        );
+      }
+
+      function reconciliationAvailable(state) {
+        return (
+          attachmentEarnable(state) || ORISON.hasFlag(state, "response-attached")
+        );
+      }
+
+      function journeyComplete(state) {
+        return (
+          ORISON.hasFlag(state, "response-attached") &&
+          ORISON.hasFlag(state, "orphan-released") &&
+          fragmentAddresses.every((address) =>
+            ORISON.hasFlag(state, `fragment-probe-${address}`),
+          )
+        );
+      }
+
+      function recoveredPath(state) {
+        return ORISON.hasFlag(state, "response-attached")
+          ? "/.lost+found/00000000/archive/"
+          : "/.lost+found/00000000/";
+      }
+
+      function reconciliationPending(state) {
+        return (
+          attachmentEarnable(state) &&
+          !ORISON.hasFlag(state, "response-attached")
+        );
+      }
+
+      function commandHint(state) {
+        if (reconciliationPending(state)) {
+          return "run: reconcile response 00000000";
+        }
+        if (ORISON.hasFlag(state, "response-attached")) {
+          return "open: recovered directory";
+        }
+        return ORISON.hasFlag(state, "unpacked")
+          ? "open: recovered inode"
+          : "run: unpack orison.zip";
+      }
+
+      function syncQuickCommand(state) {
+        const pending = reconciliationPending(state);
+        quickCommand.textContent = commandHint(state);
+        quickCommand.classList.toggle("quick-command--primary", pending);
+        return pending;
+      }
+
+      function reconciliationEvidence(state) {
+        const lines = [
+          ["reading retained response ledger ...", ""],
+          ["operation / response reconciliation", "line--dim"],
+          ["source / current local trace", "line--dim"],
+          ["target / recovered inode 00000000", "line--dim"],
+          ["authority / operator occupied", ""],
+          ["compatibility vector / complete", ""],
+          ["reclassifying detached response sectors ...", ""],
+          [`rsp/0000 trace/${state.id} / retained source`, "line--action"],
+        ];
+
+        state.order.slice(0, 8).forEach((route, index) => {
+          const count = ORISON.countLabel(state.seen[route] || 0, 3);
+          lines.push([
+            `rsp/${String(index + 1).padStart(4, "0")} path${routePaths[route] || `/${route}`} / access ${count}`,
+            "",
+          ]);
+        });
+
+        state.answers.forEach((answer, index) => {
+          lines.push([
+            `rsp/${String(index + 9).padStart(4, "0")} compatibility/${String(index + 1).padStart(2, "0")} / checksum ${answer}`,
+            "",
+          ]);
+        });
+
+        const commands = commandClasses
+          .filter(([bit]) => state.obs.commands & bit)
+          .map(([, label]) => label);
+        lines.push([
+          `rsp/0014 command classes / ${commands.join("+") || "none"}`,
+          "",
+        ]);
+        lines.push([
+          `rsp/0015 input surface / ${state.obs.mode} / refusal ${ORISON.countLabel(state.obs.refused, 3)}`,
+          "",
+        ]);
+        lines.push([
+          `rsp/0016 retention threshold / ${state.obs.held.join("+") || "none"}`,
+          "",
+        ]);
+        lines.push([
+          `rsp/0017 integrity / ${ORISON.hasFlag(state, "checksum-match") ? "matched" : ORISON.hasFlag(state, "checksum-drift") ? "drift retained" : "unverified"}`,
+          "",
+        ]);
+        lines.push([
+          `rsp/0018 carrier / ${ORISON.hasFlag(state, "heard") ? "opened" : "unheard"} / return ${ORISON.countLabel(state.returns, 7)}`,
+          "",
+        ]);
+        if (state.witness) {
+          lines.push([`rsp/0019 witness/${state.witness} / ownership unresolved`, ""]);
+        }
+        lines.push(["central directory exhausted", "line--dim"]);
+        lines.push(["continuing from retained response sectors", "line--action"]);
+        lines.push([`owner null -> trace/${state.id}`, ""]);
+        return lines;
+      }
+
+      function replayEvidence(state) {
+        const commands = commandClasses
+          .filter(([bit]) => state.obs.commands & bit)
+          .map(([, label]) => label)
+          .join("+") || "none";
+        return [
+          ["response reconciliation / completed ledger", "line--dim"],
+          [`trace/${state.id} / source retained`, ""],
+          [`route sectors / ${state.order.slice(0, 8).join("+")}`, ""],
+          [`compatibility sectors / ${state.answers.join("+")}`, ""],
+          [`command classes / ${commands}`, ""],
+          [`input surface / ${state.obs.mode} / refusal ${ORISON.countLabel(state.obs.refused, 3)}`, ""],
+          [`retention threshold / ${state.obs.held.join("+") || "none"}`, ""],
+        ];
+      }
+
+      async function runReconciliation() {
+        if (reconciliationRunning) return;
+        const state = ORISON.read();
+        if (!reconciliationAvailable(state)) {
+          addLine("reconcile: retained response ledger is incomplete", "line--fault");
+          return;
+        }
+
+        reconciliationRunning = true;
+        input.disabled = true;
+        quickCommand.disabled = true;
+        reconciliationToken += 1;
+        const token = reconciliationToken;
+        const replay = ORISON.hasFlag(state, "response-attached");
+        output.querySelector(".reconciliation-ledger")?.remove();
+        if (!output.querySelector(".archive-object-line")) addArchiveObjectLine();
+
+        const ledger = document.createElement("section");
+        ledger.className = "reconciliation-ledger";
+        ledger.setAttribute("aria-hidden", "true");
+        output.append(ledger);
+        operationStatus.textContent = replay
+          ? "Reviewing the completed response reconciliation."
+          : "Response reconciliation in progress.";
+
+        const evidence = replay ? replayEvidence(state) : reconciliationEvidence(state);
+        if (reducedMotion || replay) {
+          evidence.forEach(([text, className]) =>
+            addReconciliationLine(ledger, text, className),
+          );
+        } else {
+          for (let index = 0; index < evidence.length; index += 1) {
+            const [text, className] = evidence[index];
+            const line = addReconciliationLine(ledger, text, className);
+            line.scrollIntoView({ block: "nearest" });
+            const delay = index < 7 ? 230 : Math.max(38, 145 - index * 4);
+            await pause(delay);
+            if (token !== reconciliationToken) return;
+          }
+        }
+
+        addReconciliationLine(
+          ledger,
+          `response-sector/00000000: source reassigned / trace ${state.id}`,
+          "line--action",
+        );
+        const finalState = replay ? state : ORISON.flag("response-attached");
+        ORISON.renderRecoveryField(finalState);
+        output.querySelector(".archive-path")?.remove();
+        addArchivePath(recoveredPath(finalState));
+        operationStatus.textContent =
+          `Response sector assigned to trace ${finalState.id}.`;
+        reconciliationRunning = false;
+        input.disabled = false;
+        quickCommand.disabled = false;
+        syncQuickCommand(finalState);
+        input.focus();
+        return finalState;
+      }
+
+      function addArchivePath(path = "/.lost+found/00000000/") {
+        if (output.querySelector(".archive-path")) return;
+        const record = document.createElement("a");
+        record.className = "archive-path";
+        record.href = path;
+        record.textContent = `${window.location.origin}${path}`;
+        output.append(record);
+      }
+
+      function addArchiveObjectLine() {
+        if (output.querySelector(".archive-object-line")) {
+          warningNode = output.querySelector(".archive-warning");
+          return;
+        }
+        const line = addLine("", "line--dim archive-object-line");
+        line.append("-r--r--r--  ?  null  null  0  ");
+        const name = document.createElement("span");
+        name.className = "archive-object-name";
+        name.textContent = "orison.zip";
+        warningNode = document.createElement("span");
+        warningNode.className = "archive-warning";
+        warningNode.setAttribute("role", "img");
+        warningNode.setAttribute(
+          "aria-label",
+          "Recovery warning: unresolved archive condition",
+        );
+        warningNode.textContent = "!";
+        line.append(name, warningNode);
+      }
+
+      function warningProfile(state) {
+        if (ORISON.hasFlag(state, "operator-probe")) {
+          return { interval: 8800, sound: "retained" };
+        }
+        if (
+          ORISON.hasFlag(state, "forecast-returned") ||
+          ORISON.hasFlag(state, "forecast-held")
+        ) {
+          return { interval: 6600, sound: "weather" };
+        }
+        return { interval: 4400, sound: "relay" };
+      }
+
+      function stopWarningLoop() {
+        window.clearTimeout(warningTimer);
+      }
+
+      function pulseWarning() {
+        if (!warningNode || document.visibilityState !== "visible") return;
+        const profile = warningProfile(ORISON.read());
+        if (warningAudioActive) ORISON.soundPulse(profile.sound);
+        warningTimer = window.setTimeout(pulseWarning, profile.interval);
+      }
+
+      function startWarningLoop(immediate = false) {
+        stopWarningLoop();
+        if (!warningNode || warningNode.dataset.armed !== "true") return;
+        const profile = warningProfile(ORISON.read());
+        warningTimer = window.setTimeout(pulseWarning, immediate ? 0 : profile.interval);
+      }
+
+      function syncWarning(state) {
+        if (!warningNode) return;
+        const armed = ORISON.hasFlag(state, "warning-armed");
+        warningNode.dataset.armed = String(armed);
+        if (armed) startWarningLoop(false);
+      }
+
+      function armWarning() {
+        if (!warningNode) addArchiveObjectLine();
+        ORISON.flag("warning-armed");
+        warningAudioActive = true;
+        warningNode.dataset.armed = "true";
+        startWarningLoop(true);
+      }
+
+      function stagedPause(milliseconds) {
+        return reducedMotion ? Math.max(70, Math.round(milliseconds * 0.2)) : milliseconds;
+      }
+
+      function scheduleBoot(token, milliseconds, callback) {
+        window.setTimeout(() => {
+          if (token === bootToken) callback();
+        }, stagedPause(milliseconds));
+      }
+
+      function renderCompletedTerminal(state) {
+        bootToken += 1;
+        unpackToken += 1;
+        reconciliationToken += 1;
+        stopWarningLoop();
+        extracting = false;
+        reconciliationRunning = false;
+        warningAudioActive = false;
+        warningNode = null;
+        output.replaceChildren();
+        terminal.setAttribute(
+          "aria-label",
+          "ORISON recovery terminal with retained completed trace",
+        );
+        terminalIdentity.textContent = "orison.zip / recovered archive";
+        terminalMode.textContent = "tty0 · input idle";
+        form.hidden = true;
+        quickCommand.hidden = true;
+        input.disabled = true;
+
+        addLine("ORISON RECOVERY UTILITY 0.4.19");
+        addLine("Copyright (c) [unresolved]", "line--dim");
+        addLine();
+        addLine("Scanning volume / retained operations");
+        addLine("index pass / recovered archive", "line--dim");
+        addLine("1 recovered archive present");
+        addArchiveObjectLine();
+        warningNode.setAttribute(
+          "aria-label",
+          "Recovery warning: unresolved archive regions remain",
+        );
+        warningNode.dataset.armed = "false";
+        addLine("archive state: RECOVERED", "line--action");
+        addLine(`response source: RECONCILED / ${state.id}`, "line--action");
+        addLine(`parent trace: RETAINED / ${state.id}`, "line--action");
+        addLine(
+          `requested addresses: ${fragmentAddresses.join(" ")} / RETAINED`,
+          "line--action",
+        );
+        addLine("recovery queue: EMPTY", "line--dim");
+        addLine("missing regions: 014 028 059 / UNRESOLVED", "line--fault");
+        addLine();
+        addLine(
+          "input channel: IDLE / no detached operation pending",
+          "line--dim",
+        );
+        operationStatus.textContent =
+          `Trace ${state.id} retained; no detached operation is pending.`;
+      }
+
+      function boot(state) {
+        bootToken += 1;
+        const token = bootToken;
+        stopWarningLoop();
+        warningAudioActive = false;
+        warningNode = null;
+        output.replaceChildren();
+        terminal.removeAttribute("data-state");
+        terminal.setAttribute("aria-label", "ORISON archive extraction terminal");
+        terminalIdentity.textContent = "orison.zip / self-extracting archive";
+        terminalMode.textContent = "tty0 · guest";
+        form.hidden = false;
+        quickCommand.hidden = false;
+        input.disabled = false;
+        quickCommand.disabled = false;
+        operationStatus.textContent = "";
+        addLine("ORISON RECOVERY UTILITY 0.4.19");
+        addLine("Copyright (c) [unresolved]", "line--dim");
+        addLine();
+        addLine("Scanning volume / ...");
+        const pendingReconciliation = syncQuickCommand(state);
+
+        scheduleBoot(token, 240, () => {
+          if (!ingressClause) return;
+          addLine("ingress / external presence relay", "line--dim");
+          addLine(ingressClause, "line--dim");
+          ingressClause = null;
+        });
+        scheduleBoot(token, 360, () => addLine("index pass / compressed objects" , "line--dim"));
+        scheduleBoot(token, 820, () =>
+          addLine(
+            ORISON.hasFlag(state, "unpacked")
+              ? "1 detached object found"
+              : "1 compressed object found",
+          ),
+        );
+        scheduleBoot(token, 1180, () => {
+          addArchiveObjectLine();
+          syncWarning(state);
+        });
+        scheduleBoot(token, 1580, () => {
+          if (ORISON.hasFlag(state, "unpacked")) {
+            addLine("archive state: OPEN", "line--action");
+            if (ORISON.awareness(state) >= 4) {
+              addLine("observer state: OPEN", "line--action");
+            }
+            if (
+              ORISON.hasFlag(state, "operator-probe") &&
+              !ORISON.hasFlag(state, "operator-occupied")
+            ) {
+              addLine("operator return: UNRESOLVED", "line--fault");
+            }
+            if (
+              ORISON.hasFlag(state, "operator-occupied") &&
+              !ORISON.hasFlag(state, "response-attached")
+            ) {
+              addLine("recovery state: INCOMPLETE", "line--fault");
+              addLine(`response source: DETACHED / ${state.id}`, "line--fault");
+            }
+            if (ORISON.hasFlag(state, "response-attached")) {
+              addLine(`response source: RECONCILED / ${state.id}`, "line--action");
+            }
+            addLine();
+            if (!pendingReconciliation) {
+              addArchivePath(recoveredPath(state));
+            }
+          } else {
+            addLine();
+            addLine('Type "unpack" to recover its contents.', "line--dim");
+          }
+        });
+      }
+
+      function pause(milliseconds) {
+        const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        return new Promise((resolve) =>
+          window.setTimeout(resolve, reduced ? 0 : milliseconds),
+        );
+      }
+
+      async function unpack() {
+        if (extracting) return;
+        const initialState = ORISON.read();
+        const pendingReconciliation = reconciliationPending(initialState);
+        const token = ++unpackToken;
+        bootToken += 1;
+        output.querySelector(".archive-path")?.remove();
+        if (!output.querySelector(".archive-object-line")) {
+          addLine("1 compressed object found");
+          addArchiveObjectLine();
+        }
+        armWarning();
+        extracting = true;
+        input.disabled = true;
+        quickCommand.disabled = true;
+
+        addLine("guest@orison:/ $ unpack orison.zip");
+        if (ORISON.hasFlag(initialState, "unpacked")) {
+          addLine("object already recovered", "line--dim");
+          if (
+            attachmentEarnable(initialState) &&
+            !ORISON.hasFlag(initialState, "response-attached")
+          ) {
+            addLine("response source remains detached", "line--fault");
+            addLine('Run "reconcile response 00000000".', "line--dim");
+          }
+          addLine();
+          addLine("The archive was not empty.", "line--dim");
+          if (!pendingReconciliation) {
+            addArchivePath(recoveredPath(initialState));
+          }
+          input.disabled = false;
+          quickCommand.disabled = false;
+          syncQuickCommand(initialState);
+          extracting = false;
+          input.focus();
+          return;
+        }
+        const sequence = [
+          ["[1/4] inspecting archive envelope", "line--dim"],
+          ["locating end-of-central-directory record ... found", ""],
+          ["reading central directory ... 1 compressed object", ""],
+          ["creation host / not recorded", "line--fault"],
+          ["trailing data / retained", "line--dim"],
+          ["[2/4] parsing damaged directory", "line--dim"],
+          ["entry ./00000000 / offset 0x00000000", ""],
+          ["ownership null:null / unresolved", "line--fault"],
+          ["permissions r--r--r-- / retained", ""],
+          ["declared checksum differs from recovered copy", "line--fault"],
+          ["[3/4] recovering detached inode", "line--dim"],
+          ["allocating ./.lost+found/00000000/", ""],
+          ["recovering ./00000000 ... done", ""],
+          ["checksum mismatch / accepted as evidence", "line--fault"],
+          ["directory timestamps / unavailable", "line--dim"],
+          ["[4/4] mounting recovery field", "line--dim"],
+          ["mounting recovered object read-only ... done", ""],
+          ["recovered path / ./.lost+found/00000000/", "line--action"],
+        ];
+
+        for (let index = 0; index < sequence.length; index += 1) {
+          const [text, className] = sequence[index];
+          const phaseLine = text.startsWith("[");
+          await pause(phaseLine ? 360 : 190 + Math.random() * 170);
+          if (token !== unpackToken) return;
+          addLine(text, className);
+        }
+
+        const finalState = ORISON.flag("unpacked");
+        const pendingAfterUnpack = syncQuickCommand(finalState);
+        addLine();
+        addLine("The archive was not empty.", "line--dim");
+        if (!pendingAfterUnpack) {
+          addArchivePath(recoveredPath(finalState));
+        }
+        input.disabled = false;
+        quickCommand.disabled = false;
+        extracting = false;
+        syncWarning(finalState);
+        input.focus();
+      }
+
+      function runCommand(rawCommand) {
+        const command = rawCommand.trim().toLowerCase();
+        input.value = "";
+
+        if (!command) return;
+        if (command === "recover --attach 00000000") {
+          ORISON.observeCommand("recovery", true);
+          addLine(`guest@orison:/ $ ${command}`);
+          addLine('recover: use "reconcile response 00000000"', "line--dim");
+          return;
+        }
+        if (command === "reconcile response 00000000") {
+          ORISON.observeCommand("recovery");
+          addLine(`guest@orison:/ $ ${command}`);
+          runReconciliation();
+          return;
+        }
+        if (
+          command === "unpack" ||
+          command === "unpack orison.zip" ||
+          command === "tar -xf orison.zip" ||
+          command === "unzip orison.zip"
+        ) {
+          ORISON.observeCommand("recovery");
+          unpack();
+          return;
+        }
+
+        addLine(`guest@orison:/ $ ${command}`);
+        if (command === "ls" || command === "ls -la") {
+          ORISON.observeCommand("inspect");
+          bootToken += 1;
+          if (!output.querySelector(".archive-object-line")) {
+            addLine("1 compressed object found");
+          }
+          addArchiveObjectLine();
+        } else if (command === "file orison.zip") {
+          ORISON.observeCommand("inspect");
+          bootToken += 1;
+          if (!output.querySelector(".archive-object-line")) {
+            addLine("1 compressed object found");
+            addArchiveObjectLine();
+          }
+          armWarning();
+          addLine("orison.zip: archive data, origin unknown, trailing data");
+        } else if (command === "help") {
+          ORISON.observeCommand("utility");
+          addLine("commands: ls, file, ps, whoami, dmesg, mount, unpack, reconcile, clear");
+        } else if (command === "whoami") {
+          ORISON.observeCommand("process");
+          const state = ORISON.read();
+          addLine(
+            ORISON.awareness(state) >= 3 ? `observer:${state.id}` : "guest",
+          );
+        } else if (command === "ps" || command === "ps aux") {
+          ORISON.observeCommand("process");
+          addLine("PID  S  COMMAND");
+          addLine("  0  D  [orison]");
+          addLine("  1  S  recovery --wait-for-input");
+          if (ORISON.hasFlag(ORISON.read(), "unpacked")) {
+            addLine(`  ?  R  observer:${ORISON.read().id}`, "line--fault");
+          }
+        } else if (command === "dmesg") {
+          ORISON.observeCommand("process");
+          addLine("[    0.000000] receiver: no originating device");
+          addLine("[    0.041900] watchdog: input channel armed");
+          if (ORISON.hasFlag(ORISON.read(), "unpacked")) {
+            addLine(
+              `[ activity/${String(ORISON.read().activity).padStart(2, "0")} ] orphan: process attached to ${ORISON.read().id}`,
+              "line--fault",
+            );
+          }
+        } else if (command === "mount" || command.startsWith("mount ")) {
+          ORISON.observeCommand("mount", true);
+          addLine(
+            ORISON.hasFlag(ORISON.read(), "examined")
+              ? "mount: directory operation belongs to the compatibility utility"
+              : "mount: recovered object has not accepted an input source",
+            "line--dim",
+          );
+        } else if (command === "clear") {
+          ORISON.observeCommand("utility");
+          boot(ORISON.read());
+        } else {
+          ORISON.observeCommand("", true);
+          addLine(`${command}: command not found`, "line--dim");
+        }
+      }
+
+      form.addEventListener("submit", (event) => {
+        event.preventDefault();
+        runCommand(input.value);
+      });
+
+      quickCommand.addEventListener("click", () => {
+        const state = ORISON.read();
+        if (
+          attachmentEarnable(state) &&
+          !ORISON.hasFlag(state, "response-attached")
+        ) {
+          ORISON.observeCommand("recovery");
+          addLine("guest@orison:/ $ reconcile response 00000000");
+          runReconciliation();
+        } else if (ORISON.hasFlag(state, "unpacked")) {
+          ORISON.observeCommand("inspect");
+          window.location.assign(recoveredPath(state));
+        } else {
+          ORISON.observeCommand("recovery");
+          unpack();
+        }
+      });
+
+      document.addEventListener("click", (event) => {
+        if (!event.target.closest("a, button, input")) input.focus();
+      });
+
+      document.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === "hidden") {
+          stopWarningLoop();
+        } else if (warningNode?.dataset.armed === "true") {
+          startWarningLoop(false);
+        }
+      });
+
+      window.addEventListener("pagehide", () => {
+        unpackToken += 1;
+        extracting = false;
+        reconciliationToken += 1;
+        reconciliationRunning = false;
+        input.disabled = false;
+        quickCommand.disabled = false;
+        stopWarningLoop();
+      });
+
+      ORISON.page({
+        name: "root",
+        ambient: false,
+        render(state) {
+          if (journeyComplete(state)) {
+            renderCompletedTerminal(state);
+            return;
+          }
+          boot(state);
+          input.focus();
+        },
+      });
+      ORISON.terminalInput(input);
+    </script>
+  </body>
+</html>

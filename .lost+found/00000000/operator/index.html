@@ -1,0 +1,1019 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>ORISON / active process</title>
+    <link rel="stylesheet" href="/assets/base.css?v=8d65c5a18cc9" />
+    <style>
+      .operator {
+        display: grid;
+        grid-template-columns: minmax(430px, 1fr) minmax(340px, 0.5fr);
+        min-height: calc(100vh - 7.5rem);
+      }
+
+      .operator-side {
+        display: grid;
+        align-content: center;
+        padding: 3rem clamp(2rem, 5vw, 6rem) 3rem 0;
+        border-right: 1px solid var(--red);
+      }
+
+      .operator-side h1 {
+        position: relative;
+        z-index: 1;
+        margin: 0;
+        color: var(--bone);
+        font: 400 clamp(9rem, 24vw, 24rem) / 0.65 var(--serif);
+        letter-spacing: -0.11em;
+        text-align: center;
+      }
+
+      .operator-side p {
+        max-width: 24rem;
+        color: var(--dim);
+      }
+
+      .operator-main {
+        align-self: center;
+        padding: 4rem 0 3rem clamp(2rem, 5vw, 5rem);
+      }
+
+      .operator-main h2 {
+        margin: 0 0 2rem;
+        font: 400 clamp(2rem, 4.2vw, 3.8rem) / 0.92 var(--serif);
+        letter-spacing: -0.05em;
+      }
+
+      .search-instrument {
+        position: relative;
+        display: grid;
+        min-height: min(58vh, 42rem);
+        margin: 1.5rem 0 2rem;
+        place-items: center;
+        border-block: 1px solid rgba(255, 64, 80, 0.32);
+        background:
+          linear-gradient(90deg, transparent 49.9%, rgba(255, 64, 80, 0.2) 50%, transparent 50.1%),
+          linear-gradient(transparent 49.9%, rgba(123, 141, 152, 0.12) 50%, transparent 50.1%);
+      }
+
+      .search-instrument::before,
+      .search-instrument::after {
+        content: "";
+        position: absolute;
+        inset: 12% 20%;
+        border: 1px solid rgba(123, 141, 152, 0.16);
+        border-radius: 50%;
+      }
+
+      .search-instrument::after {
+        inset: 25% 34%;
+        border-color: rgba(255, 64, 80, 0.25);
+      }
+
+      .ingress {
+        z-index: 1;
+        align-self: stretch;
+        display: grid;
+        grid-template-rows: auto 1fr auto auto;
+        gap: clamp(1rem, 2.5vh, 1.75rem);
+        width: 100%;
+        padding: clamp(1.25rem, 3vw, 2.75rem) clamp(1rem, 2vw, 2rem);
+      }
+
+      .ingress[hidden] {
+        display: none;
+      }
+
+      .ingress-kicker {
+        margin: 0;
+        color: var(--dim);
+        font-size: 0.68rem;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+      }
+
+      .ingress-source {
+        align-self: center;
+        margin: 0;
+        font-family: var(--mono);
+        font-weight: 400;
+      }
+
+      .ingress-source span {
+        display: block;
+        color: var(--dim);
+        font-size: clamp(0.72rem, 1.15vw, 0.9rem);
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+
+      .ingress-source strong {
+        display: block;
+        margin-top: 0.55rem;
+        color: var(--receiver);
+        font: 500 clamp(1.6rem, 4vw, 3.6rem) / 0.96 var(--mono);
+        letter-spacing: -0.045em;
+        overflow-wrap: anywhere;
+      }
+
+      .ingress-ledger {
+        display: grid;
+        grid-template-columns: 1.4fr 0.8fr 0.8fr;
+        margin: 0;
+        border-block: 1px solid var(--faint);
+      }
+
+      .ingress-ledger div {
+        min-width: 0;
+        padding: 0.8rem;
+      }
+
+      .ingress-ledger div + div {
+        border-left: 1px solid var(--faint);
+      }
+
+      .ingress-ledger dt,
+      .ingress-chronology span,
+      .ingress-verdict span {
+        color: var(--dim);
+        font-size: 0.62rem;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+
+      .ingress-ledger dd {
+        margin: 0.35rem 0 0;
+        color: var(--bone);
+        font-size: clamp(0.7rem, 1.05vw, 0.82rem);
+        overflow-wrap: anywhere;
+      }
+
+      .ingress-ledger .fault,
+      .ingress-chronology .fault,
+      .ingress-verdict strong {
+        color: var(--red);
+      }
+
+      .ingress-chronology {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+      }
+
+      .ingress-chronology p {
+        display: grid;
+        gap: 0.4rem;
+        margin: 0;
+      }
+
+      .ingress-chronology strong {
+        color: var(--bone);
+        font: 400 clamp(0.85rem, 1.4vw, 1.1rem) / 1 var(--mono);
+      }
+
+      .ingress-verdict {
+        display: flex;
+        justify-content: space-between;
+        gap: 1rem;
+        margin: 0;
+        padding-top: 0.9rem;
+        border-top: 1px solid rgba(255, 64, 80, 0.32);
+      }
+
+      .ingress-verdict strong {
+        font-size: clamp(0.66rem, 1vw, 0.8rem);
+        letter-spacing: 0.06em;
+        text-align: right;
+        text-transform: uppercase;
+      }
+
+      .search-instrument[data-ingress] {
+        place-items: stretch;
+        background: none;
+      }
+
+      .search-instrument[data-ingress]::before,
+      .search-instrument[data-ingress]::after {
+        display: none;
+      }
+
+      .search-instrument[data-ingress] > h1,
+      .search-instrument[data-ingress] > .environment-field {
+        visibility: hidden;
+      }
+
+      .operator[data-ingress] .operator-main {
+        align-self: end;
+        padding-bottom: clamp(3rem, 8vh, 6rem);
+      }
+
+      .operator[data-ingress] .operator-main h2 {
+        max-width: 20rem;
+        font-size: clamp(2rem, 3.2vw, 3rem);
+      }
+
+      .environment-field {
+        position: absolute;
+        inset: 0;
+        margin: 0;
+        color: var(--dim);
+        font-size: 7px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+      }
+
+      .environment-field div {
+        position: absolute;
+        display: grid;
+        gap: 0.25rem;
+        max-width: 13rem;
+      }
+
+      .environment-field div:nth-child(1) { top: 7%; left: 0; }
+      .environment-field div:nth-child(2) { top: 7%; right: 0; text-align: right; }
+      .environment-field div:nth-child(3) { top: 46%; left: 0; }
+      .environment-field div:nth-child(4) { top: 46%; right: 0; text-align: right; }
+      .environment-field div:nth-child(5) { bottom: 7%; left: 0; }
+      .environment-field div:nth-child(6) { right: 0; bottom: 7%; text-align: right; }
+
+      .environment-field dt {
+        color: rgba(123, 141, 152, 0.62);
+      }
+
+      .environment-field dd {
+        margin: 0;
+        color: var(--bone);
+        font-size: 8px;
+        overflow-wrap: anywhere;
+      }
+
+      .authority-field[hidden],
+      .authority-path[hidden] {
+        display: none;
+      }
+
+      .authority-field {
+        position: absolute;
+        inset: 0;
+        color: var(--dim);
+        font-size: 7px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+
+      .authority-field::before {
+        content: "";
+        position: absolute;
+        top: 19%;
+        bottom: 19%;
+        left: 50%;
+        border-left: 1px solid rgba(85, 217, 120, 0.26);
+      }
+
+      .authority-node {
+        position: absolute;
+        display: grid;
+        gap: 0.35rem;
+        width: min(13rem, 36%);
+        margin: 0;
+        overflow-wrap: anywhere;
+      }
+
+      .authority-node span {
+        color: rgba(123, 141, 152, 0.62);
+      }
+
+      .authority-node strong {
+        color: var(--bone);
+        font-weight: 400;
+      }
+
+      .authority-node--source { top: 7%; left: 0; }
+      .authority-node--role { top: 7%; right: 0; text-align: right; }
+      .authority-node--privilege { bottom: 7%; left: 0; }
+      .authority-node--reference { right: 0; bottom: 7%; text-align: right; }
+
+      .authority-node--reference strong {
+        color: var(--receiver);
+        font: 400 clamp(1.8rem, 4vw, 3.2rem) / 0.8 var(--serif);
+        letter-spacing: -0.04em;
+      }
+
+      .authority-path {
+        margin: 1.5rem 0 3rem;
+        padding-block: 1rem;
+        border-block: 1px solid rgba(85, 217, 120, 0.25);
+      }
+
+      .authority-route {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.45rem;
+        margin: 1rem 0 1.5rem;
+        padding: 0;
+        list-style: none;
+        color: var(--dim);
+        font-size: 8px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .authority-route li {
+        display: flex;
+        align-items: center;
+        gap: 0.45rem;
+      }
+
+      .authority-route li:not(:last-child)::after {
+        content: "→";
+        color: rgba(85, 217, 120, 0.45);
+      }
+
+      .authority-route li:last-child {
+        color: var(--receiver);
+      }
+
+      .authority-metrics {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1rem;
+        margin: 0;
+      }
+
+      .authority-metrics div {
+        padding-top: 0.6rem;
+        border-top: 1px solid var(--faint);
+      }
+
+      .authority-metrics dt {
+        color: var(--dim);
+        font-size: 7px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+
+      .authority-metrics dd {
+        margin: 0.35rem 0 0;
+        color: var(--bone);
+        overflow-wrap: anywhere;
+      }
+
+      .intervention-reading {
+        margin: 1.5rem 0 0;
+        padding: 1rem 0 0 1rem;
+        border-left: 1px solid rgba(85, 217, 120, 0.45);
+        color: var(--dim);
+        font-family: var(--serif);
+        line-height: 1.5;
+      }
+
+      .intervention-reading .micro {
+        display: block;
+        margin-bottom: 0.55rem;
+        color: var(--receiver);
+        font-family: var(--mono);
+      }
+
+      .assessment {
+        margin: 3rem 0;
+        padding: 1.2rem;
+        border: 1px solid var(--red);
+        color: var(--red);
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+      }
+
+      .inference {
+        margin: 3rem 0;
+        padding-left: 1.2rem;
+        border-left: 1px solid var(--faint);
+      }
+
+      .inference ul {
+        display: grid;
+        gap: 0.8rem;
+        margin: 1.2rem 0 0;
+        padding: 0;
+        list-style: none;
+        color: var(--dim);
+        font-family: var(--serif);
+        font-size: 1.05rem;
+        line-height: 1.45;
+      }
+
+      .inference li::before {
+        content: "— ";
+        color: var(--receiver);
+      }
+
+      .operator[data-mode="authority"] {
+        grid-template-columns: minmax(360px, 0.72fr) minmax(410px, 1fr);
+      }
+
+      .operator[data-mode="authority"] .environment-field {
+        display: none;
+      }
+
+      .operator[data-mode="authority"] .operator-side h1 {
+        font-size: clamp(9rem, 19vw, 18rem);
+      }
+
+      .operator[data-mode="authority"] .operator-side {
+        border-color: var(--receiver);
+      }
+
+      .operator[data-mode="authority"] .operator-side h1 {
+        color: var(--receiver);
+      }
+
+      .operator[data-mode="authority"] .operator-main {
+        background: linear-gradient(
+          90deg,
+          rgba(85, 217, 120, 0.035),
+          transparent 60%
+        );
+      }
+
+      .operator[data-mode="authority"] .inference {
+        border-color: var(--red);
+      }
+
+      .operator-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem 2rem;
+      }
+
+      .operator-actions a,
+      .operator-actions button {
+        padding: 0;
+        border: 0;
+        background: none;
+        color: var(--dim);
+        cursor: pointer;
+        text-decoration: underline;
+        text-underline-offset: 0.28em;
+      }
+
+      .operator-actions--narrative {
+        margin-top: 2rem;
+      }
+
+      .operator-actions--narrative .operator-action--primary {
+        padding: 0.75rem 1rem;
+        border: 1px solid var(--receiver);
+        color: var(--receiver);
+        font-weight: 700;
+        text-decoration: none;
+      }
+
+      .operator-actions--utility {
+        margin-top: 1.25rem;
+        padding-top: 1.25rem;
+        border-top: 1px solid var(--faint);
+        font-size: 0.8rem;
+      }
+
+      .operator-actions a:focus-visible,
+      .operator-actions button:focus-visible {
+        outline: 2px solid var(--receiver);
+        outline-offset: 4px;
+      }
+
+      .invitation {
+        margin-top: 2rem;
+        padding: 1rem;
+        border-left: 1px solid var(--faint);
+        color: var(--dim);
+        overflow-wrap: anywhere;
+      }
+
+      @media (min-width: 721px) and (max-height: 760px) {
+        .operator-side {
+          padding-top: 1.5rem;
+          padding-bottom: 1.5rem;
+        }
+        .operator-main {
+          align-self: start;
+          padding-top: 1.5rem;
+          padding-bottom: 1.5rem;
+        }
+        .operator-main h2 {
+          margin-bottom: 1rem;
+          font-size: clamp(2rem, 3.4vw, 3rem);
+        }
+        .search-instrument {
+          min-height: min(44vh, 24rem);
+          margin-block: 0.75rem;
+        }
+        .operator[data-mode="authority"] .operator-side h1 {
+          font-size: clamp(8rem, 15vw, 13rem);
+        }
+        .authority-path {
+          margin: 0.75rem 0 1rem;
+          padding-block: 0.6rem;
+        }
+        .authority-route {
+          margin: 0.5rem 0 0.75rem;
+        }
+        .intervention-reading {
+          margin-top: 0.75rem;
+          padding-top: 0.5rem;
+        }
+        .assessment {
+          margin: 1rem 0;
+          padding: 0.7rem;
+        }
+        .operator-actions--narrative {
+          margin-top: 1rem;
+        }
+        .inference {
+          margin: 1.5rem 0;
+        }
+      }
+
+      @media (max-width: 720px) {
+        .operator {
+          display: block;
+        }
+        .operator-side {
+          padding-right: 0;
+          border-right: 0;
+          border-bottom: 1px solid var(--red);
+        }
+        .operator-main {
+          padding-left: 0;
+        }
+        .search-instrument {
+          min-height: 30rem;
+        }
+        .ingress {
+          gap: 1.25rem;
+          padding: 1.5rem 1rem;
+        }
+        .ingress-ledger {
+          grid-template-columns: 1fr 1fr;
+        }
+        .ingress-ledger div:first-child {
+          grid-column: 1 / -1;
+          border-bottom: 1px solid var(--faint);
+        }
+        .ingress-ledger div:nth-child(2) {
+          border-left: 0;
+        }
+        .operator[data-ingress] .operator-main {
+          padding-top: 3rem;
+          padding-bottom: 3rem;
+        }
+        .environment-field div {
+          max-width: 9rem;
+        }
+        .authority-node {
+          width: 40%;
+        }
+        .authority-node--reference strong {
+          font-size: 2rem;
+        }
+        .authority-metrics {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="scanlines"></div>
+    <div class="frame">
+      <header class="machine-header">
+        <span class="machine-mark">ORISON OPERATOR</span>
+        <span>privilege inherited from subject</span>
+        <span>process active</span>
+      </header>
+
+      <main class="operator" id="operatorRecord">
+        <section class="operator-side">
+          <p class="micro fault" id="sideStatus" role="status">operator not found</p>
+          <div class="search-instrument" id="searchInstrument">
+            <h1 id="sideMarker">0</h1>
+            <dl class="environment-field" id="environmentField"></dl>
+            <section class="ingress" id="operatorIngress" aria-labelledby="ingressTitle" hidden>
+              <p class="ingress-kicker">foreground account / retained process</p>
+              <h1 class="ingress-source" id="ingressTitle">
+                <span>controlling source</span>
+                <strong>observer/<b id="ingressSource">--------</b></strong>
+              </h1>
+              <dl class="ingress-ledger">
+                <div>
+                  <dt>session</dt>
+                  <dd>orison-operator[0]</dd>
+                </div>
+                <div>
+                  <dt>terminal</dt>
+                  <dd class="fault">none</dd>
+                </div>
+                <div>
+                  <dt>leader</dt>
+                  <dd class="fault">not present</dd>
+                </div>
+              </dl>
+              <div class="ingress-chronology">
+                <p>
+                  <span>source attached</span>
+                  <strong class="fault">−00:00:00.021</strong>
+                </p>
+                <p>
+                  <span>session opened</span>
+                  <strong>+00:00:00.000</strong>
+                </p>
+              </div>
+              <p class="ingress-verdict">
+                <span>chronology</span>
+                <strong>rejected / source retained</strong>
+              </p>
+            </section>
+            <div class="authority-field" id="authorityField" hidden>
+              <p class="authority-node authority-node--source">
+                <span>behavioral source</span>
+                <strong id="authoritySource">--------</strong>
+              </p>
+              <p class="authority-node authority-node--role">
+                <span>role</span>
+                <strong id="authorityRole">operator / inferred</strong>
+              </p>
+              <p class="authority-node authority-node--privilege">
+                <span>privilege</span>
+                <strong id="authorityPrivilege">inherited / pending</strong>
+              </p>
+              <p class="authority-node authority-node--reference">
+                <span>authority reference</span>
+                <strong id="authorityReference">unresolved</strong>
+              </p>
+            </div>
+          </div>
+          <p id="sideFinding">
+            The system has completed an observation interval without locating an
+            operator.
+          </p>
+          <p id="sideRevision">
+            A behavioral source remains connected.
+          </p>
+        </section>
+
+        <section class="operator-main">
+          <p class="micro" id="recordType">subject environment / temporary reading</p>
+          <h2 id="recordTitle">Every boundary returned a source.</h2>
+
+          <nav class="operator-actions operator-actions--narrative" aria-label="record navigation">
+            <a class="operator-action--primary" id="archiveReturn" href="../extent/">attempt archive return</a>
+            <a id="rootReturn" href="/">attempt to leave</a>
+          </nav>
+
+          <section class="authority-path" id="authorityPath" hidden>
+            <p class="micro">retained path / privilege propagation</p>
+            <ol class="authority-route" id="authorityRoute"></ol>
+            <dl class="authority-metrics">
+              <div><dt>response vector</dt><dd id="authorityVector">-.-.-.-.-</dd></div>
+              <div><dt>carrier state</dt><dd id="authorityCarrier">unheard</dd></div>
+              <div><dt>return events</dt><dd id="authorityReturns">0</dd></div>
+            </dl>
+            <p class="intervention-reading">
+              <span class="micro">retained intervention / bounded reading</span>
+              <span id="interventionReading"></span>
+            </p>
+          </section>
+
+          <p class="assessment" id="assessment">
+            identity match: unnecessary / behavioral match: sufficient
+          </p>
+
+          <section class="inference" id="inference" hidden>
+            <p class="micro" id="inferenceLabel">
+              archive hypothesis / forced-choice inference / non-diagnostic
+            </p>
+            <ul id="inferenceRows"></ul>
+          </section>
+
+          <p id="conclusion">
+            Curiosity stimulus accepted. Restricted path pursued. Return
+            behavior established. The remaining purpose of the examination is
+            not present in this volume.
+          </p>
+
+          <nav class="operator-actions operator-actions--utility" aria-label="local utilities">
+            <button id="invite" type="button">produce another witness</button>
+            <a href="/erase/">erase local trace</a>
+            <a href="/privacy.txt">processing record</a>
+          </nav>
+          <p class="invitation" id="invitation" hidden></p>
+        </section>
+      </main>
+
+      <footer class="machine-footer">
+        <span>trace <span data-trace-id>--------</span></span>
+        <span>coarse activity <span data-observed-activity>0000–0029s</span></span>
+      </footer>
+    </div>
+
+    <script src="/assets/orison.js?v=6cd727dafb4f"></script>
+    <script>
+      const answerGroups = [
+        [
+          ["valuable", "Concealment increases perceived value for this subject."],
+          ["dangerous", "Warnings increase investigative pressure for this subject."],
+          ["system", "The subject protects structures before considering their contents."],
+        ],
+        [
+          ["record", "Conflicting evidence is granted authority before memory."],
+          ["memory", "Private continuity is defended against external records."],
+          ["contradiction", "The subject prolongs contradictions rather than resolving them."],
+        ],
+        [
+          ["compliant", "Instructions are obeyed once obedience becomes a form of inquiry."],
+          ["forward", "Prescribed sequence is interpreted as a constraint to resist."],
+          ["parallel", "Irreversible choices are delayed by maintaining parallel routes."],
+        ],
+        [
+          ["process", "Responsibility is separated from whatever continues running."],
+          ["operator", "Absence does not release the operator from responsibility."],
+          ["interruption", "Rupture is treated as more durable than either participant."],
+        ],
+        [
+          ["earlier", "Authenticity is located before observation."],
+          ["changed", "Observation is accepted as part of the authentic record."],
+          ["comparison", "Difference is trusted more than either version."],
+        ],
+      ];
+
+      const routeLabels = {
+        root: "terminal",
+        inode: "recovery inode",
+        exam: "examination",
+        archive: "directory",
+        mirror: "camera 06",
+        weather: "weather 19",
+        integrity: "manifest 32",
+        choir: "carrier 44",
+        staff: "register 71",
+        letter: "dead letter",
+        operator: "operator",
+        extent: "extent",
+      };
+
+      function answerInference(state) {
+        return answerGroups
+          .map((group) => group.find(([value]) => state.answers.includes(value)))
+          .filter(Boolean);
+      }
+
+      function answerVector(state) {
+        return answerGroups
+          .map((group) => {
+            const index = group.findIndex(([value]) => state.answers.includes(value));
+            return index < 0 ? "-" : String(index + 1);
+          })
+          .join(".");
+      }
+
+      function carrierState(state) {
+        if (ORISON.hasFlag(state, "heard") && ORISON.hasFlag(state, "forecast-returned")) {
+          return "interval 44 / retained after history return";
+        }
+        if (ORISON.hasFlag(state, "heard") && ORISON.hasFlag(state, "forecast-held")) {
+          return "interval 44 / source remained at front 19";
+        }
+        if (ORISON.hasFlag(state, "heard")) return "heard / output ended locally";
+        if (ORISON.hasFlag(state, "warning-armed")) return "relay fragment / armed";
+        return "unheard";
+      }
+
+      function renderEnvironment(machine) {
+        const readings = [
+          ["display boundary", machine.screen],
+          ["active aperture", machine.viewport],
+          ["process field", `${machine.browser} / ${machine.platform}`],
+          ["locale boundary", `${machine.locale} / ${machine.zone}`],
+          ["input surface", machine.touch],
+          ["motion field", machine.motion],
+        ];
+        const field = document.querySelector("#environmentField");
+        field.replaceChildren();
+        readings.forEach(([label, value]) => {
+          const row = document.createElement("div");
+          const name = document.createElement("dt");
+          const reading = document.createElement("dd");
+          name.textContent = label;
+          reading.textContent = value;
+          row.append(name, reading);
+          field.append(row);
+        });
+      }
+
+      function renderInference(state, expanded) {
+        const interpretations = answerInference(state);
+        if (!interpretations.length) return;
+        const inference = document.querySelector("#inference");
+        const rows = document.querySelector("#inferenceRows");
+        inference.hidden = false;
+        rows.replaceChildren();
+        interpretations
+          .slice(0, expanded ? interpretations.length : 2)
+          .forEach(([, interpretation]) => {
+            const row = document.createElement("li");
+            row.textContent = interpretation;
+            rows.append(row);
+          });
+      }
+
+      function renderAuthorityPath(state) {
+        const route = document.querySelector("#authorityRoute");
+        route.replaceChildren();
+        state.order.forEach((entry) => {
+          const item = document.createElement("li");
+          item.textContent = routeLabels[entry] || entry;
+          route.append(item);
+        });
+        document.querySelector("#authoritySource").textContent = state.id;
+        document.querySelector("#authorityVector").textContent = answerVector(state);
+        document.querySelector("#authorityCarrier").textContent = carrierState(state);
+        document.querySelector("#authorityReturns").textContent =
+          ORISON.countLabel(state.returns, 7);
+        renderIntervention(state);
+      }
+
+      function renderIntervention(state) {
+        const commandLabels = [
+          [1, "recovery"],
+          [2, "inspection"],
+          [4, "process inquiry"],
+          [8, "mount"],
+          [16, "utility"],
+        ];
+        const roomLabels = {
+          mirror: "06",
+          weather: "19",
+          integrity: "32",
+          choir: "44",
+          staff: "71",
+        };
+        const modes = {
+          unknown: "No activation surface survived migration.",
+          keyboard: "The keyboard channel remained exclusive.",
+          pointer: "The pointer channel remained exclusive.",
+          touch: "The touch channel remained exclusive.",
+          mixed: "More than one activation surface entered the same source.",
+        };
+        const commands = commandLabels
+          .filter(([bit]) => state.obs.commands & bit)
+          .map(([, label]) => label);
+        const refused = [
+          "No refused command remained.",
+          "One refused command remained attached.",
+          "Refusal was repeated.",
+          "The refused boundary saturated.",
+        ][state.obs.refused];
+        const held = state.obs.held.map((room) => roomLabels[room]).filter(Boolean);
+        const operation = commands.length
+          ? `Accepted operation classes: ${commands.join(" / ")}.`
+          : "No accepted command class survived migration.";
+        const retention = held.length
+          ? `Objects ${held.join(" / ")} crossed the retention threshold.`
+          : "No recovered object crossed the retention threshold.";
+        document.querySelector("#interventionReading").textContent =
+          `${modes[state.obs.mode]} ${operation} ${refused} ${retention}`;
+      }
+
+      const instrument = document.querySelector("#searchInstrument");
+      const ingress = document.querySelector("#operatorIngress");
+      const sideStatus = document.querySelector("#sideStatus");
+      const operatorRecord = document.querySelector("#operatorRecord");
+
+      function clearIngress() {
+        if (!instrument.hasAttribute("data-ingress")) return;
+        operatorRecord.removeAttribute("data-ingress");
+        instrument.removeAttribute("data-ingress");
+        ingress.hidden = true;
+        sideStatus.textContent = "operator not found";
+        document.querySelector("#sideFinding").textContent =
+          "The system has completed an observation interval without locating an operator.";
+        document.querySelector("#sideRevision").textContent =
+          "A behavioral source remains connected.";
+      }
+
+      function runIngress(state) {
+        operatorRecord.dataset.ingress = "";
+        instrument.dataset.ingress = "";
+        ingress.hidden = false;
+        document.querySelector("#ingressSource").textContent = state.id;
+        sideStatus.textContent = "controlling terminal absent / foreground retained";
+        document.querySelector("#sideFinding").textContent =
+          "No process was present to inherit the foreground.";
+        document.querySelector("#sideRevision").textContent =
+          "The foreground was occupied anyway.";
+      }
+
+      ORISON.page({
+        name: "operator",
+        render(initialState, context) {
+          clearIngress();
+          const eligible =
+            context.previous === "letter" &&
+            initialState.seen.operator === 1 &&
+            ORISON.hasFlag(initialState, "letter") &&
+            !initialState.seen.extent &&
+            !ORISON.hasFlag(initialState, "operator-probe") &&
+            !ORISON.hasFlag(initialState, "operator-occupied");
+          let state = ORISON.flag("operator-probe");
+          const archiveReturn = document.querySelector("#archiveReturn");
+          const rootReturn = document.querySelector("#rootReturn");
+          archiveReturn.href = state.seen.extent
+            ? "../archive/"
+            : "../extent/";
+          archiveReturn.textContent = state.seen.extent
+            ? "open recovered directory"
+            : "attempt archive return";
+          const machine = ORISON.profile();
+          const revisited =
+            state.seen.operator >= 2 &&
+            (Boolean(state.seen.extent) || context.previous !== "operator");
+          const newlyOccupied =
+            state.seen.extent &&
+            revisited &&
+            !ORISON.hasFlag(state, "operator-occupied");
+          if (newlyOccupied) state = ORISON.flag("operator-occupied");
+          const occupied =
+            newlyOccupied || ORISON.hasFlag(state, "operator-occupied");
+
+          if (occupied && !ORISON.hasFlag(state, "response-attached")) {
+            archiveReturn.classList.remove("operator-action--primary");
+            rootReturn.classList.add("operator-action--primary");
+            rootReturn.textContent = "return retained response to recovery utility";
+          }
+
+          if (revisited) {
+            operatorRecord.dataset.mode = "authority";
+            document.querySelector("#sideStatus").textContent = "operator inferred";
+            document.querySelector("#sideMarker").textContent = "1";
+            document.querySelector("#sideFinding").textContent =
+              "The absent operator was reconstructed from decisions retained by the volume.";
+            document.querySelector("#sideRevision").textContent =
+              "Its route was indexed before its identity.";
+            document.querySelector("#recordType").textContent =
+              "subject record / reconstructed locally";
+            document.querySelector("#recordTitle").textContent =
+              "It was looking inward.";
+            document.querySelector("#assessment").textContent =
+              "identity match: unavailable / interpretive match: self-authored";
+            document.querySelector("#conclusion").textContent =
+              "The recovered records did not describe a prior subject. They acquired one from the order of access, the answers retained, and the decision to return.";
+            document.querySelector("#authorityField").hidden = false;
+            document.querySelector("#authorityPath").hidden = false;
+            renderAuthorityPath(state);
+
+            if (occupied) {
+              document.querySelector("#sideStatus").textContent = "operator occupied";
+              document.querySelector("#sideFinding").textContent =
+                "The role resolved before the source returned.";
+              document.querySelector("#sideRevision").textContent =
+                "Her privilege survived reassignment.";
+              document.querySelector("#recordType").textContent =
+                "authority record / reconstructed locally";
+              document.querySelector("#recordTitle").textContent =
+                "The count admitted an owner.";
+              document.querySelector("#authorityRole").textContent =
+                "operator / occupied";
+              document.querySelector("#authorityPrivilege").textContent =
+                "inherited / active";
+              document.querySelector("#authorityReference").textContent = "she";
+              document.querySelector("#assessment").textContent =
+                "source match: unresolved / authority reference: SHE";
+              document.querySelector("#conclusion").textContent =
+                "One active privilege remains. Whether the source entered it or was entered by it is not recorded.";
+            }
+          }
+
+          if (!revisited) renderEnvironment(machine);
+
+          if (revisited) renderInference(state, true);
+
+          if (state.witness && !occupied) {
+            document.querySelector("#sideRevision").textContent =
+              `A prior witness supplied the token ${state.witness}.`;
+          }
+
+          if (eligible) runIngress(state);
+        },
+      });
+
+      document.querySelector("#invite").addEventListener("click", () => {
+        const state = ORISON.read();
+        const url = new URL("/.lost+found/00000000/", window.location.origin);
+        url.hash = new URLSearchParams({ witness: state.id }).toString();
+        const invitation = document.querySelector("#invitation");
+        invitation.hidden = false;
+        invitation.textContent = url.href;
+      });
+    </script>
+  </body>
+</html>

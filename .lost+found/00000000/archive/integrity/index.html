@@ -1,0 +1,627 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>integrity manifest / retained copy</title>
+    <link rel="stylesheet" href="/assets/base.css?v=8d65c5a18cc9" />
+    <style>
+      .integrity-room {
+        display: grid;
+        grid-template-columns: minmax(260px, 0.52fr) minmax(480px, 1fr);
+        gap: clamp(2rem, 4.5vw, 6rem);
+        align-items: center;
+      }
+
+      .manifest-copy {
+        min-width: 0;
+        align-self: stretch;
+        display: grid;
+        align-content: center;
+        padding-right: clamp(2rem, 4vw, 5rem);
+        border-right: 1px solid var(--faint);
+      }
+
+      .manifest-copy h1 {
+        max-width: 10ch;
+        margin: 1rem 0 2rem;
+        font: 400 clamp(2.75rem, 4.4vw, 4.35rem) / 0.9 var(--serif);
+        letter-spacing: -0.055em;
+        overflow-wrap: normal;
+        text-wrap: balance;
+      }
+
+      .manifest-copy > p:not(.micro) {
+        max-width: 27rem;
+        color: var(--dim);
+        font-family: var(--serif);
+        font-size: 1.05rem;
+      }
+
+      .manifest-status {
+        margin-top: 3rem;
+        padding: 0.85rem 0;
+        border-top: 1px solid var(--faint);
+        border-bottom: 1px solid var(--faint);
+        color: var(--dim);
+        font-size: 8px;
+        letter-spacing: 0.13em;
+        text-transform: uppercase;
+      }
+
+      .manifest-status strong {
+        color: var(--bone);
+        font-weight: 400;
+      }
+
+      .integrity-form {
+        min-width: 0;
+        padding-block: 2rem;
+      }
+
+      .trace-key {
+        display: flex;
+        justify-content: flex-end;
+        gap: 1.5rem;
+        margin-bottom: 0.8rem;
+        color: var(--dim);
+        font-size: 7px;
+        letter-spacing: 0.13em;
+        text-transform: uppercase;
+      }
+
+      .trace-key span::before {
+        content: "";
+        display: inline-block;
+        width: 1.4rem;
+        height: 1px;
+        margin-right: 0.45rem;
+        vertical-align: middle;
+        background: var(--blue);
+      }
+
+      .trace-key .trace-key__retained::before {
+        background: var(--receiver);
+      }
+
+      .trace-field {
+        position: relative;
+        min-height: 38rem;
+      }
+
+      .trace-map {
+        position: absolute;
+        inset: 0;
+        z-index: 2;
+        width: 100%;
+        height: 100%;
+        overflow: visible;
+        pointer-events: none;
+      }
+
+      .trace-path {
+        fill: none;
+        stroke: var(--blue);
+        stroke-width: 1.5;
+        vector-effect: non-scaling-stroke;
+        opacity: 0.78;
+        transition: opacity 500ms ease;
+      }
+
+      .trace-path--retained {
+        stroke: var(--receiver);
+        stroke-width: 2;
+        opacity: 0.9;
+        filter: drop-shadow(0 0 4px rgba(85, 217, 120, 0.3));
+      }
+
+      .segments {
+        position: relative;
+        z-index: 3;
+        display: grid;
+        grid-template-rows: repeat(5, minmax(7.6rem, 1fr));
+        min-height: 38rem;
+      }
+
+      .segment {
+        position: relative;
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: clamp(0.45rem, 1.5vw, 1rem);
+        align-content: center;
+        min-width: 0;
+        margin: 0;
+        padding: 2rem 0 0.7rem;
+        border: 0;
+        border-top: 1px solid var(--faint);
+      }
+
+      .segment:last-child {
+        border-bottom: 1px solid var(--faint);
+      }
+
+      .segment legend {
+        position: absolute;
+        top: 0.5rem;
+        left: 0;
+        display: flex;
+        width: 100%;
+        justify-content: space-between;
+        gap: 1rem;
+        color: var(--dim);
+        font-size: 7px;
+        letter-spacing: 0.11em;
+        text-transform: uppercase;
+      }
+
+      .segment__state {
+        color: var(--dim);
+      }
+
+      .segment input {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      .segment label {
+        position: relative;
+        z-index: 3;
+        display: grid;
+        place-items: center;
+        min-height: 3.8rem;
+        padding: 0.55rem;
+        border: 1px solid rgba(123, 141, 152, 0.24);
+        background: rgba(3, 4, 5, 0.92);
+        color: var(--dim);
+        cursor: pointer;
+        font-size: 8px;
+        line-height: 1.35;
+        text-align: center;
+        text-transform: uppercase;
+        letter-spacing: 0.07em;
+        transition:
+          color 220ms ease,
+          border-color 220ms ease,
+          background 220ms ease;
+      }
+
+      .segment label:hover {
+        color: var(--bone);
+        border-color: var(--blue);
+      }
+
+      .segment input:focus-visible + label {
+        color: var(--bone);
+        outline: 1px solid var(--red);
+        outline-offset: 4px;
+      }
+
+      .segment input:checked + label {
+        border-color: var(--blue);
+        background: #080d10;
+        color: var(--bone);
+      }
+
+      .segment[data-result="match"] .segment__state,
+      .segment[data-result="retained"] .segment__state {
+        color: var(--receiver);
+      }
+
+      .segment[data-result="drift"] .segment__state {
+        color: var(--red);
+      }
+
+      .segment[data-result="retained"] input:checked + label,
+      .segment[data-result="match"] input:checked + label {
+        border-color: var(--receiver);
+      }
+
+      .segment[data-result="drift"] input:checked + label {
+        border-color: var(--red);
+      }
+
+      .segment input:disabled + label {
+        cursor: default;
+      }
+
+      .verify {
+        width: 100%;
+        margin-top: 1.4rem;
+        padding: 1rem;
+        border: 1px solid var(--bone);
+        background: transparent;
+        color: var(--bone);
+        cursor: pointer;
+        font-size: 9px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+      }
+
+      .verify:hover:not(:disabled) {
+        border-color: var(--receiver);
+        color: var(--receiver);
+      }
+
+      .verify:disabled {
+        border-color: var(--faint);
+        color: var(--dim);
+        cursor: not-allowed;
+      }
+
+      .integrity-room[data-outcome="drift"] .manifest-status {
+        border-color: var(--red);
+      }
+
+      .integrity-room[data-outcome="match"] .manifest-status,
+      .integrity-room[data-outcome="retained"] .manifest-status {
+        border-color: var(--receiver);
+      }
+
+      .unavailable {
+        align-self: center;
+        padding: 2rem;
+        border: 1px solid var(--red);
+        color: var(--dim);
+      }
+
+      @media (max-width: 980px) {
+        .integrity-room {
+          display: block;
+        }
+        .manifest-copy {
+          min-height: 31rem;
+          padding-right: 0;
+          border-right: 0;
+          border-bottom: 1px solid var(--faint);
+        }
+        .manifest-copy h1 {
+          max-width: 14ch;
+          font-size: clamp(2.65rem, 8vw, 4.35rem);
+        }
+        .integrity-form {
+          padding-block: 3rem;
+        }
+        .trace-field,
+        .segments {
+          min-height: 42rem;
+        }
+        .segments {
+          grid-template-rows: repeat(5, minmax(8.4rem, 1fr));
+        }
+        .segment label {
+          min-height: 4.6rem;
+          padding-inline: 0.3rem;
+          font-size: 7px;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .manifest-copy h1 {
+          max-width: 11ch;
+          font-size: clamp(2.35rem, 12vw, 3.35rem);
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .trace-path,
+        .segment label {
+          transition: none !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="scanlines"></div>
+    <div class="frame">
+      <header class="machine-header">
+        <span class="machine-mark">INTEGRITY MANIFEST 32</span>
+        <span>retained response sectors: 5</span>
+        <span>copy state <span id="headerState">unverified</span></span>
+      </header>
+
+      <main class="room integrity-room" id="integrityRoom">
+        <section class="manifest-copy">
+          <p class="micro" id="manifestLabel">copy reconstruction / operator input</p>
+          <h1 id="manifestTitle">Rebuild the supplied record.</h1>
+          <p id="manifestText">
+            Five response sectors survived without labels. Select the statement
+            believed to have occupied each sector, then compare the copy with its source.
+          </p>
+          <p class="manifest-status" id="manifestStatus" aria-live="polite">
+            selected sectors: <strong id="selectionCount">0 / 5</strong>
+          </p>
+          <section class="handoff-record" id="integrityHandoff" hidden>
+            <div class="handoff-record__result">
+              <span id="integrityHandoffState">copy state / retained</span>
+              <strong id="integrityHandoffResult">
+                The retained source now controls the record.
+              </strong>
+            </div>
+            <a class="handoff-record__action" href="../">
+              <span>return integrity decision to recovered directory</span>
+              <span aria-hidden="true">→</span>
+            </a>
+          </section>
+          <a class="return-link" id="integrityReturn" href="../">close object</a>
+        </section>
+
+        <form class="integrity-form" id="integrityForm">
+          <div class="trace-key" aria-hidden="true">
+            <span>reconstructed copy</span>
+            <span class="trace-key__retained">retained source</span>
+          </div>
+          <div class="trace-field" id="traceField">
+            <svg class="trace-map" id="traceMap" aria-hidden="true">
+              <polyline class="trace-path" id="inputTrace" points=""></polyline>
+              <polyline
+                class="trace-path trace-path--retained"
+                id="retainedTrace"
+                points=""
+                hidden
+              ></polyline>
+            </svg>
+            <div class="segments" id="segments"></div>
+          </div>
+          <button class="verify" id="verify" type="submit" disabled>
+            verify reconstructed copy
+          </button>
+        </form>
+
+        <section class="unavailable" id="unavailable" hidden>
+          <p class="micro fault">manifest sectors unavailable</p>
+          <p>The response channel does not contain five complete sectors.</p>
+          <a href="../../examination/">return to compatibility utility</a>
+        </section>
+      </main>
+
+      <footer class="machine-footer">
+        <span>comparison occurs within local trace</span>
+        <span>observer <span data-trace-id>--------</span></span>
+      </footer>
+    </div>
+
+    <script src="/assets/orison.js?v=6cd727dafb4f"></script>
+    <script>
+      const sectors = [
+        {
+          prompt: "sealed system",
+          answers: [
+            ["something valuable", "valuable"],
+            ["something dangerous", "dangerous"],
+            ["the system itself", "system"],
+          ],
+        },
+        {
+          prompt: "contradictory record",
+          answers: [
+            ["the record", "record"],
+            ["my memory", "memory"],
+            ["the contradiction", "contradiction"],
+          ],
+        },
+        {
+          prompt: "instruction to return",
+          answers: [
+            ["I return", "compliant"],
+            ["I continue forward", "forward"],
+            ["I open both", "parallel"],
+          ],
+        },
+        {
+          prompt: "operator disconnected",
+          answers: [
+            ["the process", "process"],
+            ["the operator", "operator"],
+            ["the interruption", "interruption"],
+          ],
+        },
+        {
+          prompt: "record changed by reading",
+          answers: [
+            ["the earlier record", "earlier"],
+            ["the changed record", "changed"],
+            ["the act of comparison", "comparison"],
+          ],
+        },
+      ];
+
+      const form = document.querySelector("#integrityForm");
+      const segments = document.querySelector("#segments");
+      const verify = document.querySelector("#verify");
+      const traceField = document.querySelector("#traceField");
+      const traceMap = document.querySelector("#traceMap");
+      const inputTrace = document.querySelector("#inputTrace");
+      const retainedTrace = document.querySelector("#retainedTrace");
+      let retainedValues = [];
+
+      function buildSegments() {
+        sectors.forEach((sector, sectorIndex) => {
+          const fieldset = document.createElement("fieldset");
+          const legend = document.createElement("legend");
+          const label = document.createElement("span");
+          const status = document.createElement("span");
+          fieldset.className = "segment";
+          fieldset.dataset.sector = String(sectorIndex);
+          label.textContent =
+            `sector ${String(sectorIndex + 1).padStart(2, "0")} / ${sector.prompt}`;
+          status.className = "segment__state";
+          status.textContent = "unresolved";
+          legend.append(label, status);
+          fieldset.append(legend);
+
+          sector.answers.forEach(([answerLabel, value], answerIndex) => {
+            const id = `sector-${sectorIndex}-${answerIndex}`;
+            const input = document.createElement("input");
+            const option = document.createElement("label");
+            input.id = id;
+            input.type = "radio";
+            input.name = `sector-${sectorIndex}`;
+            input.value = value;
+            option.htmlFor = id;
+            option.textContent = answerLabel;
+            fieldset.append(input, option);
+          });
+          segments.append(fieldset);
+        });
+      }
+
+      function selectedValues() {
+        return sectors.map((_, index) =>
+          form.querySelector(`[name="sector-${index}"]:checked`)?.value || "",
+        );
+      }
+
+      function tracePoints(values) {
+        const fieldRect = traceField.getBoundingClientRect();
+        traceMap.setAttribute(
+          "viewBox",
+          `0 0 ${fieldRect.width} ${fieldRect.height}`,
+        );
+        return values
+          .map((value, index) => {
+            if (!value) return "";
+            const input = form.querySelector(
+              `[name="sector-${index}"][value="${value}"]`,
+            );
+            const optionRect = input.nextElementSibling.getBoundingClientRect();
+            const x = optionRect.left + optionRect.width / 2 - fieldRect.left;
+            const y = optionRect.top + optionRect.height / 2 - fieldRect.top;
+            return `${x},${y}`;
+          })
+          .filter(Boolean)
+          .join(" ");
+      }
+
+      function drawTraces(showRetained = !retainedTrace.hasAttribute("hidden")) {
+        inputTrace.setAttribute("points", tracePoints(selectedValues()));
+        if (showRetained) {
+          retainedTrace.setAttribute("points", tracePoints(retainedValues));
+        }
+      }
+
+      function lockSegments(result, selections) {
+        sectors.forEach((_, index) => {
+          const fieldset = form.querySelector(`[data-sector="${index}"]`);
+          const status = fieldset.querySelector(".segment__state");
+          const agreed = selections[index] === retainedValues[index];
+          fieldset.dataset.result = result === "retained" ? "retained" : agreed ? "match" : "drift";
+          status.textContent =
+            result === "retained" ? "source retained" : agreed ? "agree" : "drift";
+        });
+        form.querySelectorAll("input").forEach((input) => {
+          input.disabled = true;
+        });
+        verify.hidden = true;
+      }
+
+      function showOutcome(outcome, selections, revisit = false) {
+        const room = document.querySelector("#integrityRoom");
+        room.dataset.outcome = revisit ? "retained" : outcome;
+        document.querySelector("#integrityHandoff").hidden = false;
+        document.querySelector("#integrityReturn").hidden = true;
+        document.querySelector("#integrityHandoffState").textContent =
+          outcome === "match"
+            ? "copy state / consistent"
+            : "copy state / source retained";
+        document.querySelector("#integrityHandoffResult").textContent =
+          outcome === "match"
+            ? "The reconstructed copy and retained source now agree."
+            : "The retained response replaced the reconstructed copy.";
+        retainedTrace.removeAttribute("hidden");
+        document.querySelector("#headerState").textContent =
+          outcome === "match" ? "consistent" : "source retained";
+        document.querySelector("#manifestLabel").textContent =
+          revisit
+            ? "integrity decision / prior reconstruction"
+            : "copy comparison / retained response source";
+
+        if (revisit) {
+          document.querySelector("#manifestTitle").textContent =
+            outcome === "match"
+              ? "The copy remembers correctly."
+              : "The source refuses correction.";
+          document.querySelector("#manifestText").textContent =
+            outcome === "match"
+              ? "The prior reconstruction agreed with all five retained sectors. The distinction between copy and source has been removed."
+              : "A prior reconstruction diverged. The retained response channel has been restored as the authoritative copy.";
+          document.querySelector("#manifestStatus").innerHTML =
+            `integrity decision: <strong>${outcome === "match" ? "copies merged" : "subject copy rejected"}</strong>`;
+          inputTrace.setAttribute("hidden", "");
+          retainedValues.forEach((value, index) => {
+            form.querySelector(`[name="sector-${index}"][value="${value}"]`).checked = true;
+          });
+          lockSegments("retained", retainedValues);
+        } else {
+          document.querySelector("#manifestTitle").textContent =
+            outcome === "match" ? "No difference remains." : "The archive kept the other version.";
+          document.querySelector("#manifestText").textContent =
+            outcome === "match"
+              ? "The reconstructed copy agrees with the retained response channel in every sector."
+              : "At least one reconstructed sector contradicts the retained response channel. The archive has classified its copy as the source.";
+          document.querySelector("#manifestStatus").innerHTML =
+            `integrity decision: <strong>${outcome === "match" ? "consistent" : "reconstruction drift"}</strong>`;
+          lockSegments(outcome, selections);
+        }
+
+        window.requestAnimationFrame(() => drawTraces(true));
+      }
+
+      buildSegments();
+
+      form.addEventListener("change", () => {
+        const count = selectedValues().filter(Boolean).length;
+        document.querySelector("#selectionCount").textContent = `${count} / 5`;
+        verify.disabled = count !== sectors.length;
+        window.requestAnimationFrame(() => drawTraces(false));
+      });
+
+      form.addEventListener("submit", (event) => {
+        event.preventDefault();
+        const selections = selectedValues();
+        if (selections.some((value) => !value)) return;
+        const outcome = selections.every(
+          (value, index) => value === retainedValues[index],
+        )
+          ? "match"
+          : "drift";
+        ORISON.flag(`checksum-${outcome}`);
+        showOutcome(outcome, selections);
+      });
+
+      window.addEventListener("resize", () => drawTraces());
+
+      ORISON.page({
+        name: "integrity",
+        render(state) {
+          retainedValues = sectors.map(
+            (sector) =>
+              sector.answers.find(([, value]) => state.answers.includes(value))?.[1] ||
+              "",
+          );
+
+          if (retainedValues.some((value) => !value)) {
+            form.hidden = true;
+            document.querySelector("#unavailable").hidden = false;
+            document.querySelector("#manifestTitle").textContent =
+              "The source is incomplete.";
+            document.querySelector("#manifestText").textContent =
+              "This manifest cannot reconstruct sectors that were never retained.";
+            document.querySelector("#manifestStatus").hidden = true;
+            return;
+          }
+
+          const priorOutcome = ORISON.hasFlag(state, "checksum-drift")
+            ? "drift"
+            : ORISON.hasFlag(state, "checksum-match")
+              ? "match"
+              : "";
+          if (priorOutcome) showOutcome(priorOutcome, retainedValues, true);
+        },
+      });
+    </script>
+  </body>
+</html>

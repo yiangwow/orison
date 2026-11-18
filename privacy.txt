@@ -1,0 +1,92 @@
+ORISON LOCAL PROCESSING RECORD
+CLASS / FUNCTIONAL / FIRST-PARTY / BROWSER-ONLY
+
+LOCAL NARRATIVE RECORD
+
+ORISON may leave one versioned record in this browser's local storage:
+
+"orison_trace_v2"
+
+The record allows the structure to change after prior interaction. It may
+retain:
+
+- a random trace code with no timestamp component
+- allowlisted pages, capped visit counts, and first-opened order
+- five forced-choice examination answers
+- coarse activity and attention bands, never exact event times
+- progression, return, integrity, carrier, invitation, completed response-attachment, parent-process intervention, and one detached-child address request
+- recognized command categories, never command text or keystrokes
+- a refused-command band
+- keyboard, pointer, touch, or mixed control activation, never pointer paths
+- which recovered objects crossed one coarse hold threshold, never dwell time
+
+The complete record is bounded to 2,048 bytes. Unknown fields and values are
+discarded before use.
+
+RETENTION WINDOW / LOGICAL 30 DAYS AFTER LAST SUCCESSFUL ORISON WRITE
+
+ORISON rejects and deletes an expired record before using it on the next load.
+Browser-only storage cannot delete itself while ORISON is closed, so physical
+bytes may remain until that next load, browser clearing, or browser eviction.
+
+MIGRATION RECORD
+
+An older "orison_trace" cookie may be read once. Accepted progression is
+coarsened into version 2 and the cookie is then deleted. The old trace code is
+rotated because its generator included a fragment of creation timing.
+
+REQUEST AND INFRASTRUCTURE BOUNDARY
+
+The version-2 narrative record is not attached to HTTP requests. Normal web
+requests still expose the requested URL, network address, and browser request
+headers to Cloudflare and nginx. Neither system receives a version-2 narrative
+record or assembles an ORISON observer profile.
+
+The detached-child sequence offers three fixed missing addresses. Requesting
+one exposes that fixed URL to Cloudflare, nginx, and ordinary access logs like
+any other page request. The URL contains no trace code, witness token, answer,
+or local classification. Which address becomes retained in the narrative stays
+inside the browser-only record.
+
+New witness invitations place the token after "#", outside the HTTP request.
+Older "?witness=" links remain compatible; their first request may expose the
+token to network infrastructure and ordinary access logs. Captured tokens are
+removed from the current visible URL.
+
+No analytics, advertising, application backend, or third-party script receives
+the narrative record. ORISON makes no deliberate third-party browser request.
+
+OPERATOR APERTURE / TEMPORARY READ
+
+The Operator aperture may temporarily render coarse information supplied by
+the browser: browser and platform family, language, timezone, screen and
+viewport dimensions, touch capability, logical processor count, approximate
+device memory when available, and visual or motion preferences.
+
+These values are rendered in the current document. They are not added to local
+storage.
+
+REQUESTED ACCESS / NONE
+
+ORISON does not request or inspect the camera, microphone, location, clipboard,
+contacts, local files, credentials, or exact identity.
+
+ERASURE ROUTE
+
+/erase/
+
+Erasure removes ORISON-controlled version-2 storage, expires the legacy cookie,
+stops active generated audio, and prevents another open ORISON tab from
+restoring the erased trace. A later root entry creates a new random trace.
+
+Erasure cannot remove ordinary Cloudflare or nginx access logs, browser history
+outside the current entry, a copied invitation in another browser, screenshots,
+or browser-managed backups.
+
+FINAL DISPOSITION
+
+The route is retained because the route alters the record.
+The observer is not retained.
+Identity has no operational relevance.
+
+CARE / NOT IMPLEMENTED

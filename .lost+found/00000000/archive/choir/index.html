@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>carrier sample 44</title>
+    <link rel="stylesheet" href="/assets/base.css?v=8d65c5a18cc9" />
+    <style>
+      .choir-room {
+        display: grid;
+        place-content: center;
+        text-align: center;
+      }
+
+      .wave {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 3px;
+        width: min(760px, 84vw);
+        height: 170px;
+        margin: 2rem auto;
+      }
+
+      .wave i {
+        display: block;
+        width: 2px;
+        height: var(--height);
+        background: var(--bone);
+        opacity: 0.22;
+        transform-origin: center;
+      }
+
+      .wave.is-active i {
+        animation: voice 1.8s ease-in-out infinite alternate;
+        animation-delay: var(--delay);
+      }
+
+      .choir-room h1 {
+        margin: 0;
+        font: 400 clamp(3rem, 6vw, 4.5rem) / 0.86 var(--serif);
+        letter-spacing: -0.06em;
+      }
+
+      .choir-room p {
+        max-width: 40rem;
+        margin-inline: auto;
+        color: var(--dim);
+      }
+
+      .listen {
+        margin-top: 1.5rem;
+        padding: 0.8rem 1.1rem;
+        border: 1px solid var(--faint);
+        background: transparent;
+        color: var(--bone);
+        cursor: pointer;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+
+      .listen:hover {
+        border-color: var(--bone);
+      }
+
+      .choir-room .handoff-record {
+        margin-inline: auto;
+        text-align: left;
+      }
+
+      @keyframes voice {
+        to {
+          height: calc(var(--height) * 0.35);
+          opacity: 0.55;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .wave.is-active i {
+          height: calc(var(--height) * 0.6);
+          opacity: 0.45;
+          animation: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="scanlines"></div>
+    <div class="frame">
+      <header class="machine-header">
+        <span class="machine-mark">SUB-AUDIBLE CARRIER</span>
+        <span>sample 44 / duration infinite</span>
+        <span>output muted</span>
+      </header>
+
+      <main class="room choir-room">
+        <p class="micro">no speech detected</p>
+        <h1 id="choirTitle">A voice below the voice.</h1>
+        <div class="wave" id="wave" aria-hidden="true"></div>
+        <p id="transcript">
+          The sample contains a stable harmonic that the transcription process
+          repeatedly classifies as language.
+        </p>
+        <button class="listen" id="listen" type="button">listen to carrier</button>
+        <p class="micro" id="carrierState">audio begins only after this control is used</p>
+        <section class="handoff-record" id="carrierHandoff" hidden>
+          <div class="handoff-record__result">
+            <span id="carrierHandoffState">carrier 44 / interval retained</span>
+            <strong id="carrierHandoffResult">
+              Output ended; the lower rhythm remained.
+            </strong>
+          </div>
+          <a class="handoff-record__action" href="../">
+            <span>return retained carrier to recovered directory</span>
+            <span aria-hidden="true">→</span>
+          </a>
+        </section>
+        <a class="return-link" id="carrierReturn" href="../">close object</a>
+      </main>
+
+      <footer class="machine-footer">
+        <span>no microphone access requested</span>
+        <span>trace <span data-trace-id>--------</span></span>
+      </footer>
+    </div>
+
+    <script src="/assets/orison.js?v=6cd727dafb4f"></script>
+    <script>
+      const wave = document.querySelector("#wave");
+      for (let index = 0; index < 96; index += 1) {
+        const bar = document.createElement("i");
+        bar.style.setProperty("--height", `${8 + Math.abs(Math.sin(index * 0.43)) * 94}px`);
+        bar.style.setProperty("--delay", `${(index % 17) * -0.08}s`);
+        wave.append(bar);
+      }
+
+      let stopCarrier;
+
+      function showCarrierHandoff(state) {
+        const returned = ORISON.hasFlag(state, "forecast-returned");
+        const held = ORISON.hasFlag(state, "forecast-held");
+        document.querySelector("#carrierHandoff").hidden = false;
+        document.querySelector("#carrierReturn").hidden = true;
+        document.querySelector("#carrierHandoffState").textContent = returned
+          ? "carrier 44 / history phase retained"
+          : held
+            ? "carrier 44 / front phase retained"
+            : "carrier 44 / interval retained";
+        document.querySelector("#carrierHandoffResult").textContent = returned
+          ? "The carrier retained the phase altered by the history return."
+          : held
+            ? "The carrier retained the phase held by front 19."
+            : `Output ended; observer ${state.id} remained attached.`;
+      }
+
+      document.querySelector("#listen").addEventListener("click", () => {
+        const state = ORISON.read();
+        const weatherChanged =
+          ORISON.hasFlag(state, "forecast-returned") ||
+          ORISON.hasFlag(state, "forecast-held");
+        stopCarrier?.();
+        stopCarrier = ORISON.openCarrier(weatherChanged ? "weather" : "carrier");
+
+        const heardState = ORISON.flag("heard");
+        wave.classList.add("is-active");
+        document.querySelector("#listen").textContent = "carrier open";
+        document.querySelector("#carrierState").textContent =
+          "the lower rhythm is synchronized to the observer";
+        document.querySelector("#transcript").textContent =
+          weatherChanged
+            ? "TRANSCRIPT: [interval 44 returned from front 19 / phase relation altered]"
+            : "TRANSCRIPT: [observer language order was already selected]";
+        showCarrierHandoff(heardState);
+      });
+
+      ORISON.page({
+        name: "choir",
+        render(state) {
+          stopCarrier = undefined;
+          wave.classList.remove("is-active");
+          document.querySelector("#listen").textContent = "listen to carrier";
+          if (ORISON.hasFlag(state, "heard")) {
+            document.querySelector("#choirTitle").textContent =
+              "It continued while muted.";
+            document.querySelector("#transcript").textContent =
+              `The carrier retained observer ${state.id} after output ended.`;
+            document.querySelector("#carrierState").textContent =
+              "output ended at navigation / interval retained";
+            showCarrierHandoff(state);
+          } else if (ORISON.hasFlag(state, "warning-armed")) {
+            document.querySelector("#transcript").textContent =
+              "Recovery utility classified a fragment of sample 44 as a warning cadence.";
+          }
+
+          if (ORISON.hasFlag(state, "forecast-returned")) {
+            document.querySelector("#choirTitle").textContent =
+              "The interval returned through history.";
+            document.querySelector("#transcript").textContent =
+              "Front 19 retained the same relation after the browser-history return. Output did not continue between documents.";
+          } else if (ORISON.hasFlag(state, "forecast-held")) {
+            document.querySelector("#choirTitle").textContent =
+              "Front 19 kept the lower interval.";
+            document.querySelector("#transcript").textContent =
+              "The predicted departure passed while the source remained. Sample 44 now carries that retained phase.";
+          }
+        },
+      });
+
+      window.addEventListener("pagehide", () => {
+        stopCarrier?.();
+        stopCarrier = undefined;
+      });
+    </script>
+  </body>
+</html>

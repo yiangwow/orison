@@ -1,0 +1,479 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>weather log / no atmosphere</title>
+    <link rel="stylesheet" href="/assets/base.css?v=8d65c5a18cc9" />
+    <style>
+      body {
+        background: var(--black);
+        color: var(--paper-ink);
+      }
+
+      body::after {
+        opacity: 0.14;
+        mix-blend-mode: multiply;
+      }
+
+      .scanlines {
+        display: none;
+      }
+
+      .paper {
+        --paper-signal: #14582e;
+        --paper-fault: #68252a;
+        width: min(900px, calc(100% - 2rem));
+        min-height: 100vh;
+        margin: 0 auto;
+        padding: clamp(2rem, 7vw, 6rem);
+        background:
+          linear-gradient(90deg, transparent 4rem, rgba(20, 88, 46, 0.2) 4.05rem, transparent 4.1rem),
+          repeating-linear-gradient(
+            to bottom,
+            transparent 0,
+            transparent 27px,
+            rgba(32, 35, 38, 0.08) 28px
+          ),
+          #d1cec3;
+        box-shadow: 0 0 80px rgba(0, 0, 0, 0.35);
+      }
+
+      .paper-head {
+        display: flex;
+        justify-content: space-between;
+        gap: 2rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid #303336;
+        font-size: 9px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+
+      .paper h1 {
+        margin: 4rem 0 2.2rem;
+        font: 700 clamp(2.4rem, 5vw, 4.5rem) / 0.9 "Arial Narrow", Arial, sans-serif;
+        letter-spacing: -0.055em;
+        text-transform: uppercase;
+      }
+
+      .navigation-front {
+        margin: 0 0 3rem;
+        padding: 1rem 0 1.2rem;
+        border-top: 1px solid rgba(32, 35, 38, 0.72);
+        border-bottom: 1px solid rgba(32, 35, 38, 0.72);
+      }
+
+      .front-head,
+      .front-readings {
+        display: flex;
+        justify-content: space-between;
+        gap: 1rem;
+        font-size: 9px;
+        letter-spacing: 0.11em;
+        text-transform: uppercase;
+      }
+
+      .front-head strong {
+        color: var(--paper-signal);
+      }
+
+      .front-track {
+        position: relative;
+        height: 7.5rem;
+        margin: 0.8rem 0;
+        overflow: hidden;
+        border-block: 1px solid rgba(32, 35, 38, 0.14);
+        background:
+          linear-gradient(90deg, transparent 49.8%, rgba(32, 35, 38, 0.18) 50%, transparent 50.2%),
+          repeating-linear-gradient(90deg, rgba(32, 35, 38, 0.08) 0 1px, transparent 1px 12.5%);
+      }
+
+      .front-track::before,
+      .front-track::after {
+        position: absolute;
+        top: 0.55rem;
+        color: #5d5b54;
+        font-size: 8px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+      }
+
+      .front-track::before {
+        content: "receiver open";
+        left: 0;
+      }
+
+      .front-track::after {
+        content: "predicted return";
+        right: 0;
+      }
+
+      .front-line {
+        position: absolute;
+        top: 2.5rem;
+        bottom: 0.8rem;
+        left: 0;
+        width: var(--front-progress, 14%);
+        border-right: 2px solid var(--paper-signal);
+        background: linear-gradient(90deg, transparent, rgba(20, 88, 46, 0.12));
+        transition: width 1s linear;
+      }
+
+      .front-line::before {
+        content: "BACK";
+        position: absolute;
+        right: -3.6rem;
+        bottom: 0;
+        color: var(--paper-signal);
+        font: 700 1.1rem "Arial Narrow", Arial, sans-serif;
+        letter-spacing: 0.08em;
+      }
+
+      .navigation-front[data-state="complete"] .front-line::before,
+      .navigation-front[data-state="held"] .front-line::before {
+        right: 0.45rem;
+      }
+
+      .front-readings span:nth-child(2) {
+        color: var(--paper-signal);
+      }
+
+      .log {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 10px;
+      }
+
+      .log td {
+        padding: 0.75rem 0;
+        border-bottom: 1px solid rgba(32, 35, 38, 0.15);
+        vertical-align: top;
+      }
+
+      .log td:first-child {
+        width: 7rem;
+        color: #5d5b54;
+      }
+
+      .forecast {
+        margin: 4rem 0 2rem;
+        padding: 1rem;
+        border: 2px solid var(--paper-fault);
+        color: var(--paper-fault);
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        transform: rotate(-0.4deg);
+      }
+
+      .comparison-source {
+        margin: -1rem 0 2rem;
+        color: #5d5b54;
+        font-size: 9px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .front-monitor {
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+        margin: -1.6rem 0 3rem;
+      }
+
+      .front-monitor button {
+        border: 0;
+        border-bottom: 1px solid rgba(32, 35, 38, 0.42);
+        padding: 0 0 0.2rem;
+        background: transparent;
+        color: #5d5b54;
+        cursor: pointer;
+        font: inherit;
+        font-size: 8px;
+        letter-spacing: 0.11em;
+        text-transform: uppercase;
+      }
+
+      .front-monitor button:focus-visible {
+        outline-color: var(--paper-signal);
+      }
+
+      .front-monitor span {
+        color: #5d5b54;
+        font-size: 8px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .navigation-front[data-state="held"] {
+        border-bottom-color: var(--paper-signal);
+      }
+
+      .navigation-front[data-state="held"] .front-track {
+        background:
+          linear-gradient(90deg, transparent 74%, rgba(20, 88, 46, 0.14) 74%),
+          repeating-linear-gradient(90deg, rgba(32, 35, 38, 0.08) 0 1px, transparent 1px 12.5%);
+      }
+
+      .paper a {
+        color: var(--paper-ink);
+      }
+
+      .paper .handoff-record {
+        --handoff-accent: var(--paper-signal);
+        --handoff-border: rgba(20, 88, 46, 0.52);
+        background: rgba(20, 88, 46, 0.035);
+      }
+
+      @media (max-width: 540px) {
+        .paper {
+          padding-inline: 1.5rem;
+          background:
+            repeating-linear-gradient(
+              to bottom,
+              transparent 0,
+              transparent 27px,
+              rgba(32, 35, 38, 0.08) 28px
+            ),
+            #d1cec3;
+        }
+        .front-head,
+        .front-readings {
+          align-items: flex-start;
+          flex-direction: column;
+          gap: 0.35rem;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .front-line {
+          transition: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="paper">
+      <header class="paper-head">
+        <span>ORISON ARRAY / DAILY FORECAST</span>
+        <span>station 0 / atmosphere unavailable</span>
+      </header>
+
+      <h1>Weather inside the receiver</h1>
+
+      <section class="navigation-front" aria-label="Predicted navigation front">
+        <div class="front-head">
+          <span>front 19 / retained navigation pressure</span>
+          <strong id="frontState">approaching</strong>
+        </div>
+        <div class="front-track" id="frontTrack" aria-hidden="true">
+          <span class="front-line" id="frontLine"></span>
+        </div>
+        <div class="front-readings">
+          <span>direction / browser history</span>
+          <span id="frontEta">arrival / 00:14</span>
+          <span>atmosphere / none</span>
+        </div>
+      </section>
+
+      <table class="log" aria-label="Forecast events">
+        <tbody id="forecastRows"></tbody>
+      </table>
+
+      <p class="forecast" id="backInstruction">
+        Forecast pending. Keep this document open.
+      </p>
+
+      <p class="comparison-source" id="comparisonSource"></p>
+
+      <div class="front-monitor">
+        <button id="monitorFront" type="button">monitor carrier interval</button>
+        <span id="monitorState">output muted</span>
+      </div>
+
+      <p id="weatherNote">
+        The array was designed to predict disturbances before they entered the
+        observable field.
+      </p>
+
+      <section class="handoff-record" id="weatherHandoff" hidden>
+        <div class="handoff-record__result">
+          <span id="weatherHandoffState">front 19 / retained</span>
+          <strong id="weatherHandoffResult">The comparison crossed the return boundary.</strong>
+        </div>
+        <a class="handoff-record__action" href="../">
+          <span>return retained front to recovered directory</span>
+          <span aria-hidden="true">→</span>
+        </a>
+      </section>
+
+      <a id="weatherReturn" href="../">close object</a>
+    </main>
+
+    <script src="/assets/orison.js?v=6cd727dafb4f"></script>
+    <script>
+      const forecastOpenedAt = Date.now();
+      let frontTimer;
+      let stopWeatherCarrier;
+
+      function stamp(offset) {
+        return new Date(forecastOpenedAt + offset * 1000).toLocaleTimeString("en-GB", {
+          hour12: false,
+        });
+      }
+
+      function addRetainedEvent() {
+        const rows = document.querySelector("#forecastRows");
+        if (rows.querySelector('[data-event="source-remains"]')) return;
+        const retained = document.createElement("tr");
+        const time = document.createElement("td");
+        const event = document.createElement("td");
+        retained.dataset.event = "source-remains";
+        time.textContent = stamp(14);
+        event.textContent = "predicted departure missed / input source remains";
+        retained.append(time, event);
+        rows.append(retained);
+      }
+
+      function showWeatherHandoff(mode) {
+        document.querySelector("#weatherHandoff").hidden = false;
+        document.querySelector("#weatherReturn").hidden = true;
+        document.querySelector("#weatherHandoffState").textContent =
+          mode === "held"
+            ? "front 19 / source retained"
+            : "front 19 / history return retained";
+        document.querySelector("#weatherHandoffResult").textContent =
+          mode === "held"
+            ? "The source remained after the predicted departure."
+            : "The comparison crossed the browser-history boundary.";
+      }
+
+      function setFront(mode) {
+        const front = document.querySelector(".navigation-front");
+        const state = document.querySelector("#frontState");
+        const eta = document.querySelector("#frontEta");
+        const line = document.querySelector("#frontLine");
+        window.clearInterval(frontTimer);
+
+        if (mode === "unavailable") {
+          front.dataset.state = "unavailable";
+          state.textContent = "comparison source unavailable";
+          eta.textContent = "arrival / not armed";
+          line.style.setProperty("--front-progress", "0%");
+          return;
+        }
+
+        if (mode === "confirmed" || mode === "held") {
+          front.dataset.state = "complete";
+          if (mode === "held") front.dataset.state = "held";
+          state.textContent =
+            mode === "held" ? "source remains attached" : "retained after passage";
+          eta.textContent = "arrival / confirmed";
+          line.style.setProperty("--front-progress", "100%");
+          showWeatherHandoff(mode);
+          return;
+        }
+
+        delete front.dataset.state;
+
+        const update = () => {
+          const elapsed = Math.floor((Date.now() - forecastOpenedAt) / 1000);
+          const remaining = Math.max(0, 14 - elapsed);
+          const progress = Math.min(100, 14 + (elapsed / 14) * 86);
+          line.style.setProperty("--front-progress", `${progress}%`);
+          eta.textContent = `arrival / 00:${String(remaining).padStart(2, "0")}`;
+          if (remaining === 0) {
+            window.clearInterval(frontTimer);
+            ORISON.flag("forecast-held");
+            setFront("held");
+            addRetainedEvent();
+            document.querySelector("#backInstruction").textContent =
+              "Arrival retained: the predicted departure did not occur.";
+            document.querySelector("#weatherNote").textContent =
+              "The receiver has reassigned the remaining source to the completed front.";
+            if (stopWeatherCarrier) ORISON.soundPulse("weather");
+          }
+        };
+        update();
+        frontTimer = window.setInterval(update, 1000);
+      }
+
+      ORISON.page({
+        name: "weather",
+        render(state, context) {
+          stopWeatherCarrier = undefined;
+          document.querySelector("#monitorFront").textContent =
+            "monitor carrier interval";
+          document.querySelector("#monitorState").textContent = "output muted";
+          const rows = [
+            [stamp(-18), "receiver opened"],
+            [stamp(-11), `observer ${state.id} entered forecast field`],
+            [stamp(-4), "observer reads line 02"],
+            [stamp(7), "observer searches for a changing value"],
+            [stamp(14), "observer attempts backward navigation"],
+          ];
+          document.querySelector("#forecastRows").innerHTML = rows
+            .map(([time, event]) => `<tr><td>${time}</td><td>${event}</td></tr>`)
+            .join("");
+
+          const instruction = document.querySelector("#backInstruction");
+          const source = document.querySelector("#comparisonSource");
+          const fromCamera = context.previous === "mirror";
+          if (fromCamera) {
+            source.textContent =
+              "Camera 06 comparison active. Browser Back remains the return operation.";
+          } else {
+            source.innerHTML =
+              'Comparison source unavailable. <a id="cameraSource" href="../mirror/">open Camera 06 source</a>.';
+          }
+          if (
+            !ORISON.hasFlag(state, "forecast") &&
+            fromCamera
+          ) {
+            ORISON.flag("forecast");
+            setFront("approaching");
+            instruction.textContent =
+              "Do not use the link below. Return to Camera 06 with the browser Back control.";
+          } else if (ORISON.hasFlag(state, "forecast-held")) {
+            setFront("held");
+            addRetainedEvent();
+            instruction.textContent =
+              "Arrival retained: the predicted departure did not occur.";
+            document.querySelector("#weatherNote").textContent =
+              "The receiver has reassigned the remaining source to the completed front.";
+          } else if (ORISON.hasFlag(state, "forecast-returned")) {
+            setFront("confirmed");
+            instruction.textContent =
+              "Forecast confirmed: the browser-history return was retained.";
+          } else {
+            setFront("unavailable");
+            instruction.textContent =
+              "Open Camera 06 and activate its Weather comparison before this front can be retained.";
+          }
+
+          if (ORISON.awareness(state) >= 4) {
+            document.querySelector("#weatherNote").textContent =
+              "Prediction and instruction are functionally identical.";
+          }
+        },
+      });
+
+      document.querySelector("#monitorFront").addEventListener("click", () => {
+        if (!stopWeatherCarrier) {
+          stopWeatherCarrier = ORISON.openCarrier("weather");
+        }
+        document.querySelector("#monitorFront").textContent = "carrier monitored";
+        document.querySelector("#monitorState").textContent =
+          "interval 44 / phase displaced";
+      });
+
+      window.addEventListener("pagehide", () => {
+        window.clearInterval(frontTimer);
+        stopWeatherCarrier?.();
+        stopWeatherCarrier = undefined;
+      });
+    </script>
+  </body>
+</html>

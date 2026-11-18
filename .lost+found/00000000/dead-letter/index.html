@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>undelivered / recipient present</title>
+    <link rel="stylesheet" href="/assets/base.css?v=8d65c5a18cc9" />
+    <style>
+      .letter-room {
+        display: grid;
+        place-content: center;
+        padding: 4rem 0;
+      }
+
+      .envelope {
+        position: relative;
+        width: min(670px, 90vw);
+        padding: clamp(2rem, 7vw, 5rem);
+        background: #c9c5b9;
+        color: #202326;
+        box-shadow: 18px 24px 0 rgba(98, 84, 106, 0.13);
+        transform: rotate(0.35deg);
+      }
+
+      .envelope::before {
+        content: "UNDELIVERED";
+        position: absolute;
+        top: 2rem;
+        right: 2rem;
+        padding: 0.25rem 0.5rem;
+        border: 2px solid #81252c;
+        color: #81252c;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        transform: rotate(4deg);
+      }
+
+      .letter-head {
+        padding-bottom: 1rem;
+        border-bottom: 1px solid rgba(32, 35, 38, 0.25);
+        font-size: 9px;
+      }
+
+      .letter-body {
+        margin-top: 3rem;
+        font: 1.08rem/1.8 var(--serif);
+      }
+
+      .letter-body p {
+        margin: 0 0 1.4rem;
+      }
+
+      .operator-address {
+        display: inline-block;
+        padding: 0.45rem 0.65rem;
+        background: #14582e;
+        color: #c9c5b9;
+        font-family: var(--mono);
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-decoration: none;
+      }
+
+      .operator-address:focus-visible {
+        outline: 3px solid #14582e;
+        outline-offset: 4px;
+      }
+
+      .outside {
+        margin-top: 3rem;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="scanlines"></div>
+    <div class="frame">
+      <header class="machine-header">
+        <span class="machine-mark">DEAD LETTER PROCESS</span>
+        <span>recipient resolution active</span>
+        <span>object 00</span>
+      </header>
+
+      <main class="room letter-room">
+        <article class="envelope">
+          <header class="letter-head">
+            TO: <span data-trace-id>--------</span><br />
+            SENT: <span id="sentDate">----/--/--</span><br />
+            SUBJECT: RETURN PROCEDURE
+          </header>
+
+          <div class="letter-body">
+            <p>The volume has been reopened enough for the recipient field to resolve.</p>
+            <p>
+              The recovered contents did not identify a recipient. Reopening
+              the volume supplied one.
+            </p>
+            <p>
+              No action is required. Continuing is itself an action and has
+              already been entered.
+            </p>
+            <p>
+              Operator residue:
+              <a class="operator-address" id="operatorAddress" href="../operator/">
+                open Operator residue /operator/ →
+              </a>
+            </p>
+          </div>
+        </article>
+        <p class="outside"><a href="../archive/">return to recovered directory</a></p>
+      </main>
+
+      <footer class="machine-footer">
+        <span>message predates recipient</span>
+        <span>delivery confirmed</span>
+      </footer>
+    </div>
+
+    <script src="/assets/orison.js?v=6cd727dafb4f"></script>
+    <script>
+      ORISON.page({
+        name: "letter",
+        render(state) {
+          ORISON.flag("letter");
+          document.querySelector("#sentDate").textContent = new Date(
+            (state.firstDay - 19) * 86400000,
+          )
+            .toISOString()
+            .slice(0, 10);
+        },
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,1999 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>recovered directory</title>
+    <link rel="stylesheet" href="/assets/base.css?v=8d65c5a18cc9" />
+    <style>
+      .directory {
+        position: relative;
+        display: grid;
+        grid-template-columns: minmax(230px, 0.55fr) minmax(340px, 1fr);
+        overflow: hidden;
+        isolation: isolate;
+      }
+
+      .process-residue {
+        position: absolute;
+        inset: 8% -9vw 5% 27%;
+        z-index: 0;
+        display: grid;
+        grid-template-columns: minmax(330px, 1.15fr) minmax(240px, 0.85fr);
+        gap: clamp(2rem, 5vw, 5rem);
+        overflow: hidden;
+        color: #55d978;
+        font-size: 7px;
+        line-height: 1.5;
+        letter-spacing: 0.12em;
+        opacity: 0.1;
+        pointer-events: none;
+        transform: perspective(700px) rotateY(-6deg) rotateZ(-1deg);
+        transform-origin: center;
+        mask-image: linear-gradient(
+          90deg,
+          transparent,
+          black 12%,
+          black 88%,
+          transparent
+        );
+        transition: opacity 700ms ease;
+      }
+
+      .process-residue[data-attention] {
+        opacity: 0.18;
+      }
+
+      .process-column {
+        min-width: 0;
+        margin-top: var(--column-shift, 0);
+        transition: margin-top 6s cubic-bezier(0.22, 0.61, 0.36, 1);
+      }
+
+      .process-column--events {
+        align-self: center;
+        opacity: 0.7;
+        margin-top: calc(3rem + var(--column-shift, 0));
+      }
+
+      .process-column__label {
+        margin-bottom: 0.65rem;
+        color: rgba(133, 238, 159, 0.72);
+        letter-spacing: 0.18em;
+      }
+
+      .process-lane {
+        display: grid;
+        grid-template-columns: 2.7rem 1.35rem minmax(0, 1fr) 3.1rem;
+        align-items: center;
+        min-height: 2rem;
+        border-bottom: 1px solid rgba(85, 217, 120, 0.08);
+        opacity: 0.52;
+        transition:
+          opacity 350ms ease,
+          color 350ms ease,
+          background 350ms ease;
+      }
+
+      .process-lane__state {
+        color: rgba(202, 255, 213, 0.72);
+      }
+
+      .process-lane__operation {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .process-lane__tick {
+        position: relative;
+        height: 1px;
+        overflow: hidden;
+        background: rgba(85, 217, 120, 0.12);
+      }
+
+      .process-lane__tick::before {
+        content: "";
+        position: absolute;
+        inset: 0 auto 0 0;
+        width: var(--tick, 18%);
+        background: rgba(132, 255, 158, 0.74);
+        transition: width 1.4s steps(4, end);
+      }
+
+      .process-lane.is-disturbed {
+        color: rgba(174, 255, 191, 0.95);
+        opacity: 1;
+        background: linear-gradient(
+          90deg,
+          rgba(85, 217, 120, 0.12),
+          transparent 78%
+        );
+      }
+
+      .process-lane.is-suppressed {
+        opacity: 0.16;
+      }
+
+      .process-lane.is-retained {
+        color: rgba(205, 216, 209, 0.82);
+        opacity: 0.82;
+      }
+
+      .process-event {
+        display: grid;
+        grid-template-columns: 4.3rem minmax(0, 1fr);
+        gap: 0.75rem;
+        min-height: 2.15rem;
+        border-bottom: 1px solid rgba(85, 217, 120, 0.06);
+        color: rgba(112, 208, 137, 0.72);
+        opacity: 0.55;
+        transition:
+          color 350ms ease,
+          opacity 350ms ease;
+      }
+
+      .process-event:first-of-type {
+        color: rgba(174, 255, 191, 0.92);
+        opacity: 0.9;
+      }
+
+      .directory-intro {
+        position: relative;
+        z-index: 1;
+        padding: 4rem 3rem 3rem 0;
+        border-right: 1px solid var(--faint);
+      }
+
+      .directory-intro h1 {
+        margin: 1rem 0 2rem;
+        font: 400 clamp(3rem, 5vw, 4.5rem) / 0.86 var(--serif);
+        letter-spacing: -0.06em;
+      }
+
+      .directory-intro p {
+        max-width: 25rem;
+        color: var(--dim);
+      }
+
+      .operation-register {
+        max-width: 25rem;
+        margin-top: clamp(2.5rem, 6vh, 4.5rem);
+        border: 1px solid rgba(85, 217, 120, 0.3);
+        background:
+          linear-gradient(110deg, rgba(85, 217, 120, 0.075), transparent 68%),
+          rgba(3, 7, 5, 0.72);
+      }
+
+      .operation-register[hidden] {
+        display: none;
+      }
+
+      .operation-register__head {
+        display: flex;
+        justify-content: space-between;
+        gap: 1rem;
+        padding: 0.55rem 0.7rem;
+        border-bottom: 1px solid rgba(85, 217, 120, 0.18);
+        color: var(--receiver);
+        font-size: 8px;
+        letter-spacing: 0.13em;
+        text-transform: uppercase;
+      }
+
+      .operation-register__body {
+        padding: 0.85rem 0.7rem 0.95rem;
+      }
+
+      .operation-register__body strong {
+        display: block;
+        margin-bottom: 0.45rem;
+        color: var(--bone);
+        font: 400 1.2rem / 1.05 var(--serif);
+        letter-spacing: -0.02em;
+      }
+
+      .operation-register__body p {
+        margin: 0;
+        color: var(--dim);
+        font-size: 9px;
+        line-height: 1.65;
+      }
+
+      .operation-register__action {
+        display: flex;
+        justify-content: space-between;
+        gap: 1rem;
+        padding: 0.75rem 0.7rem;
+        border-top: 1px solid rgba(85, 217, 120, 0.3);
+        color: var(--bone);
+        font-size: 8px;
+        letter-spacing: 0.12em;
+        text-decoration: none;
+        text-transform: uppercase;
+      }
+
+      .operation-register__action:hover,
+      .operation-register__action:focus-visible {
+        border-color: var(--receiver);
+        color: var(--receiver);
+        outline: 1px solid rgba(85, 217, 120, 0.42);
+        outline-offset: 3px;
+      }
+
+      .directory[data-operation-active="true"] .operation-register {
+        max-width: 29rem;
+        border-color: rgba(85, 217, 120, 0.62);
+        background:
+          linear-gradient(110deg, rgba(85, 217, 120, 0.12), transparent 72%),
+          rgba(3, 7, 5, 0.88);
+      }
+
+      .directory[data-operation-active="true"] .operation-register__body strong {
+        font-size: clamp(1.35rem, 2.5vw, 1.85rem);
+      }
+
+      .directory-list {
+        position: relative;
+        z-index: 1;
+        align-self: center;
+        padding: 3rem 0 3rem clamp(2rem, 6vw, 6rem);
+      }
+
+      .file {
+        position: relative;
+        display: grid;
+        grid-template-columns: 3rem 1fr auto;
+        align-items: center;
+        gap: 1rem;
+        min-height: 5rem;
+        padding-inline: 0.15rem;
+        border-top: 1px solid var(--faint);
+        color: var(--dim);
+        text-decoration: none;
+        transition:
+          color 280ms ease,
+          padding 420ms ease,
+          border-color 420ms ease;
+      }
+
+      .file::before {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: -2.2rem;
+        width: 1.4rem;
+        height: 1px;
+        opacity: 0;
+        background: var(--receiver);
+        box-shadow: 0 0 8px rgba(85, 217, 120, 0.32);
+        transform: scaleX(0.2);
+        transform-origin: right;
+        transition:
+          opacity 250ms ease,
+          transform 420ms ease;
+      }
+
+      .file:last-child {
+        border-bottom: 1px solid var(--faint);
+      }
+
+      .file:hover,
+      .file:focus-visible,
+      .file.is-attended {
+        color: var(--bone);
+      }
+
+      .file.is-attended {
+        padding-left: 0.65rem;
+        border-color: rgba(85, 217, 120, 0.3);
+      }
+
+      .file.is-attended::before,
+      .file.is-residual::before {
+        opacity: 0.72;
+        transform: scaleX(1);
+      }
+
+      .file.is-residual::before {
+        opacity: 0.22;
+      }
+
+      .file.is-retained .file__state {
+        color: var(--receiver);
+      }
+
+      .file__number,
+      .file__state {
+        font-size: 8px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+
+      .file__name {
+        font-family: var(--serif);
+        font-size: 1.35rem;
+      }
+
+      .file[data-seen="true"] .file__state::before {
+        content: "retained / ";
+        color: var(--receiver);
+      }
+
+      .directory[data-derived="true"] {
+        grid-template-columns: minmax(270px, 0.7fr) minmax(390px, 1fr);
+      }
+
+      .directory[data-derived="true"] .directory-intro {
+        border-color: rgba(85, 217, 120, 0.52);
+      }
+
+      .directory[data-derived="true"] .directory-list {
+        display: block;
+      }
+
+      .directory[data-derived="true"] .file {
+        grid-template-columns: 3rem 1fr auto;
+      }
+
+      .directory[data-derived="true"] .file__state {
+        grid-column: auto;
+        padding-bottom: 0;
+      }
+
+      .directory[data-derived="true"] .file.is-source {
+        grid-column: auto;
+        grid-template-columns: 3rem 1fr auto;
+        min-height: 5rem;
+        margin-bottom: 0;
+        padding-left: 0.65rem;
+        border-color: rgba(85, 217, 120, 0.42);
+        color: var(--bone);
+      }
+
+      .directory[data-derived="true"] .file.is-source .file__name {
+        font-size: 1.35rem;
+        letter-spacing: 0;
+      }
+
+      .directory[data-derived="true"] .file.is-source .file__state {
+        grid-column: auto;
+        color: var(--receiver);
+      }
+
+      .directory[data-derived="true"] .file.is-source .file__state::before {
+        content: "source / ";
+      }
+
+      #letterFile,
+      #operatorFile {
+        border-color: var(--faint);
+      }
+
+      #operatorFile[data-pending] {
+        grid-column: 1 / -1;
+        grid-template-columns: 3rem minmax(0, 1fr) auto;
+        grid-template-rows: auto auto;
+        min-height: 7rem;
+        padding-block: 0.9rem;
+        border-color: rgba(255, 64, 80, 0.7);
+        color: var(--bone);
+        background: linear-gradient(
+          90deg,
+          rgba(85, 217, 120, 0.075),
+          transparent 62%
+        );
+      }
+
+      #operatorFile[data-pending] .file__number {
+        grid-row: 1 / 3;
+        color: var(--receiver);
+      }
+
+      #operatorFile[data-pending] .file__interrupt {
+        grid-column: 2 / -1;
+        color: var(--red);
+        font-size: 8px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+
+      #operatorFile[data-pending] .file__name {
+        grid-column: 2;
+      }
+
+      #operatorFile[data-pending] .file__state {
+        grid-column: 3;
+        padding-bottom: 0;
+        color: rgba(205, 216, 209, 0.72);
+      }
+
+      .parent-interlock {
+        margin: clamp(0.85rem, 2vh, 1.35rem) 0 0;
+        border: 1px solid rgba(85, 217, 120, 0.28);
+        background:
+          linear-gradient(90deg, rgba(85, 217, 120, 0.07), transparent 58%),
+          rgba(3, 7, 5, 0.82);
+        color: var(--dim);
+      }
+
+      .parent-interlock[hidden] {
+        display: none;
+      }
+
+      .parent-interlock__head {
+        display: flex;
+        justify-content: space-between;
+        gap: 1rem;
+        padding: 0.65rem 0.8rem;
+        border-bottom: 1px solid rgba(85, 217, 120, 0.18);
+        color: var(--receiver);
+        font-size: 8px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+      }
+
+      .parent-interlock__bus {
+        position: relative;
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        align-items: center;
+        height: 1.55rem;
+        margin-inline: 0.8rem;
+      }
+
+      .parent-interlock__bus::before,
+      .parent-interlock__bus::after {
+        content: "";
+        position: absolute;
+        right: 0;
+        left: 0;
+        height: 1px;
+      }
+
+      .parent-interlock__bus::before {
+        background: rgba(255, 64, 80, 0.38);
+      }
+
+      .parent-interlock__bus::after {
+        background: var(--receiver);
+        box-shadow: 0 0 9px rgba(85, 217, 120, 0.4);
+        transform: scaleX(0);
+        transform-origin: left;
+      }
+
+      .parent-interlock__bus i {
+        position: relative;
+        z-index: 1;
+        justify-self: center;
+        width: 5px;
+        height: 5px;
+        border: 1px solid rgba(255, 64, 80, 0.72);
+        background: var(--black);
+        transform: rotate(45deg);
+      }
+
+      .parent-interlock__body {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 1rem;
+        align-items: end;
+        padding: 0.7rem 0.8rem;
+      }
+
+      .parent-interlock h2 {
+        margin: 0 0 0.45rem;
+        color: var(--bone);
+        font: 400 clamp(1.45rem, 2.3vw, 2rem) / 1 var(--serif);
+        letter-spacing: -0.035em;
+      }
+
+      .parent-interlock__copy,
+      .parent-interlock__status {
+        margin: 0;
+        font-size: 9px;
+        line-height: 1.6;
+        letter-spacing: 0.06em;
+      }
+
+      .parent-interlock__action {
+        min-width: 12.5rem;
+        padding: 0.75rem 0.85rem;
+        border: 1px solid rgba(85, 217, 120, 0.62);
+        border-radius: 0;
+        background: rgba(85, 217, 120, 0.06);
+        color: var(--bone);
+        font: inherit;
+        font-size: 8px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        cursor: pointer;
+      }
+
+      .parent-interlock__action:hover,
+      .parent-interlock__action:focus-visible {
+        border-color: var(--receiver);
+        color: var(--receiver);
+        outline: 1px solid rgba(85, 217, 120, 0.42);
+        outline-offset: 3px;
+      }
+
+      .parent-interlock__action:disabled {
+        opacity: 0.42;
+        cursor: wait;
+      }
+
+      .parent-interlock__status {
+        min-height: 1.4em;
+        padding: 0 0.8rem 0.75rem;
+        color: var(--receiver);
+      }
+
+      .parent-interlock[data-state="running"] .parent-interlock__bus::after {
+        animation: parent-handoff 820ms steps(7, end) forwards;
+      }
+
+      .parent-interlock[data-state="complete"] {
+        border-color: rgba(85, 217, 120, 0.62);
+      }
+
+      .parent-interlock[data-state="complete"] .parent-interlock__bus::after {
+        transform: scaleX(1);
+      }
+
+      .parent-interlock[data-state="complete"] .parent-interlock__bus i {
+        border-color: var(--receiver);
+        background: rgba(85, 217, 120, 0.32);
+      }
+
+      .fragment-entry {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 1rem;
+        align-items: center;
+        min-height: 4.6rem;
+        margin-top: 0.75rem;
+        padding: 0.8rem;
+        border: 1px solid rgba(85, 217, 120, 0.62);
+        color: var(--bone);
+        background:
+          linear-gradient(90deg, rgba(85, 217, 120, 0.1), transparent 68%),
+          rgba(3, 7, 5, 0.74);
+        font-size: 8px;
+        letter-spacing: 0.12em;
+        text-decoration: none;
+        text-transform: uppercase;
+      }
+
+      .fragment-entry:hover,
+      .fragment-entry:focus-visible {
+        border-color: var(--receiver);
+        color: var(--receiver);
+        outline: 1px solid rgba(85, 217, 120, 0.42);
+        outline-offset: 3px;
+      }
+
+      .fragment-entry__state {
+        color: var(--red);
+        text-align: right;
+      }
+
+      .fragment-entry__label {
+        display: grid;
+        gap: 0.35rem;
+      }
+
+      .fragment-entry__label strong {
+        color: var(--receiver);
+        font: 400 1.25rem / 1.1 var(--serif);
+        letter-spacing: -0.02em;
+        text-transform: none;
+      }
+
+      .directory[data-parented="true"] .directory-intro {
+        border-color: rgba(85, 217, 120, 0.52);
+      }
+
+      .process-lane.is-parented {
+        color: rgba(174, 255, 191, 0.92);
+        opacity: 0.9;
+      }
+
+      .file[data-parented="true"] .file__state {
+        color: var(--receiver);
+      }
+
+      .file[data-parented="true"] .file__state::before {
+        content: "child / ";
+        color: var(--receiver);
+      }
+
+      .directory[data-derived="true"]
+        .file.is-source[data-parented="true"]
+        .file__state::before {
+        content: "source child / ";
+      }
+
+      .aperture-slip {
+        --slip-x: 0px;
+        --slip-y: 0px;
+        position: absolute;
+        top: clamp(4.5rem, 13vh, 7rem);
+        right: clamp(0.25rem, 1.5vw, 1.25rem);
+        z-index: 97;
+        display: flex;
+        gap: clamp(0.8rem, 1.8vw, 1.5rem);
+        align-items: center;
+        width: clamp(135px, 16vw, 220px);
+        height: clamp(46px, 5vw, 68px);
+        padding: 0 clamp(0.6rem, 1.3vw, 1rem);
+        overflow: hidden;
+        opacity: 0;
+        pointer-events: none;
+        background:
+          linear-gradient(90deg, transparent, rgba(65, 255, 104, 0.025), transparent),
+          repeating-linear-gradient(
+            90deg,
+            rgba(77, 255, 108, 0.04) 0,
+            rgba(77, 255, 108, 0.04) 1px,
+            transparent 1px,
+            transparent 7px
+          );
+        transform: translateY(-2px);
+      }
+
+      .aperture-slip::before,
+      .aperture-slip::after {
+        content: "";
+        position: absolute;
+        right: 0;
+        left: 0;
+        height: 42%;
+        z-index: 2;
+        background: var(--black);
+      }
+
+      .aperture-slip::before {
+        top: 0;
+        transform-origin: top;
+      }
+
+      .aperture-slip::after {
+        bottom: 0;
+        transform-origin: bottom;
+      }
+
+      .aperture {
+        position: relative;
+        flex: 1;
+        height: 46%;
+        border: 1px solid rgba(83, 255, 112, 0.28);
+        border-radius: 48% 52% 46% 54% / 62% 62% 38% 38%;
+        background:
+          radial-gradient(
+            ellipse 2px 8px at calc(50% + var(--slip-x)) calc(50% + var(--slip-y)),
+            #000 0 65%,
+            rgba(117, 255, 139, 0.9) 72%,
+            transparent 100%
+          ),
+          radial-gradient(
+            ellipse 17px 10px at calc(50% + var(--slip-x)) calc(50% + var(--slip-y)),
+            rgba(71, 255, 101, 0.78) 0 18%,
+            rgba(25, 122, 45, 0.4) 23% 42%,
+            transparent 48%
+          ),
+          repeating-radial-gradient(
+            ellipse at center,
+            rgba(77, 255, 108, 0.16) 0 1px,
+            transparent 2px 5px
+          );
+        box-shadow:
+          inset 0 0 12px rgba(48, 255, 83, 0.12),
+          0 0 9px rgba(48, 255, 83, 0.1);
+        transform: skewX(-4deg);
+      }
+
+      .aperture:nth-child(2) {
+        border-radius: 52% 48% 54% 46% / 58% 58% 42% 42%;
+        transform: skewX(4deg) translateY(1px);
+      }
+
+      .aperture::before,
+      .aperture::after {
+        content: "";
+        position: absolute;
+        pointer-events: none;
+      }
+
+      .aperture::before {
+        inset: -7px -5px;
+        border-top: 1px solid rgba(83, 255, 112, 0.2);
+        border-bottom: 1px solid rgba(83, 255, 112, 0.12);
+        clip-path: polygon(8% 0, 92% 0, 100% 50%, 88% 100%, 12% 100%, 0 50%);
+      }
+
+      .aperture::after {
+        top: 50%;
+        right: -10%;
+        left: -10%;
+        height: 1px;
+        background: rgba(178, 255, 190, 0.34);
+        box-shadow: 0 -7px rgba(58, 183, 78, 0.08), 0 7px rgba(58, 183, 78, 0.08);
+      }
+
+      .aperture-slip.is-visible {
+        animation: slip-visible 620ms steps(2, end) both;
+      }
+
+      .aperture-slip.is-visible::before {
+        animation: shutter-top 620ms cubic-bezier(0.7, 0, 0.2, 1) both;
+      }
+
+      .aperture-slip.is-visible::after {
+        animation: shutter-bottom 620ms cubic-bezier(0.7, 0, 0.2, 1) both;
+      }
+
+      @keyframes slip-visible {
+        0%,
+        100% {
+          opacity: 0;
+        }
+        10%,
+        78% {
+          opacity: 0.68;
+        }
+        37% {
+          opacity: 0.3;
+          transform: translate(2px, -1px);
+        }
+        42% {
+          opacity: 0.74;
+          transform: translate(-1px, 1px);
+        }
+      }
+
+      @keyframes shutter-top {
+        0%,
+        100% {
+          transform: scaleY(1);
+        }
+        16%,
+        74% {
+          transform: scaleY(0.05);
+        }
+      }
+
+      @keyframes shutter-bottom {
+        0%,
+        100% {
+          transform: scaleY(1);
+        }
+        16%,
+        74% {
+          transform: scaleY(0.08);
+        }
+      }
+
+      @keyframes parent-handoff {
+        to {
+          transform: scaleX(1);
+        }
+      }
+
+      @media (min-width: 721px) and (max-height: 760px) {
+        .directory-intro {
+          padding: 1.5rem 2rem 1.5rem 0;
+        }
+        .directory-intro h1 {
+          margin: 0.55rem 0 0.9rem;
+          font-size: clamp(2.5rem, 4vw, 3.6rem);
+        }
+        .directory-intro > p {
+          margin-block: 0.5rem;
+        }
+        .parent-interlock {
+          margin-top: 0.65rem;
+        }
+        .parent-interlock__bus {
+          height: 1rem;
+        }
+        .parent-interlock__body {
+          gap: 0.75rem;
+          padding-block: 0.55rem;
+        }
+        .parent-interlock h2 {
+          margin-bottom: 0.25rem;
+          font-size: 1.35rem;
+        }
+        .parent-interlock__copy,
+        .parent-interlock__status {
+          line-height: 1.35;
+        }
+        .parent-interlock__status {
+          padding-bottom: 0.55rem;
+        }
+        .fragment-entry {
+          min-height: 3.75rem;
+          margin-top: 0.55rem;
+          padding: 0.65rem 0.75rem;
+        }
+        .fragment-entry__label strong {
+          font-size: 1.05rem;
+        }
+        .directory-list {
+          padding-top: 1.5rem;
+          padding-bottom: 1.5rem;
+        }
+        .file {
+          min-height: 4.2rem;
+        }
+      }
+
+      @media (max-width: 720px) {
+        .directory {
+          display: block;
+        }
+        .directory-intro {
+          padding-right: 0;
+          border-right: 0;
+          border-bottom: 1px solid var(--faint);
+        }
+        .directory-list {
+          padding-left: 0;
+        }
+        .directory[data-derived="true"] .directory-list {
+          grid-template-columns: 1fr;
+        }
+        .directory[data-derived="true"] .file.is-source {
+          grid-column: 1;
+          grid-template-columns: 2.2rem minmax(0, 1fr);
+          min-height: 8rem;
+        }
+        .directory[data-derived="true"] .file.is-source .file__state {
+          grid-column: 2;
+          padding-bottom: 0.75rem;
+        }
+        #operatorFile[data-pending] {
+          grid-template-columns: 2.2rem minmax(0, 1fr);
+        }
+        #operatorFile[data-pending] .file__interrupt,
+        #operatorFile[data-pending] .file__name,
+        #operatorFile[data-pending] .file__state {
+          grid-column: 2;
+        }
+        #operatorFile[data-pending] .file__state {
+          padding-bottom: 0;
+        }
+        .parent-interlock__head,
+        .parent-interlock__body {
+          display: grid;
+          grid-template-columns: 1fr;
+        }
+        .parent-interlock__action {
+          width: 100%;
+          min-width: 0;
+        }
+        .fragment-entry {
+          grid-template-columns: 1fr;
+        }
+        .fragment-entry__state {
+          text-align: left;
+        }
+        .aperture-slip {
+          top: 4.2rem;
+          right: 0;
+          width: min(40vw, 155px);
+          height: 48px;
+          gap: 0.8rem;
+        }
+        .process-residue {
+          inset: 22% -18vw 8% 8%;
+          grid-template-columns: minmax(300px, 1fr);
+          opacity: 0.075;
+          transform: perspective(620px) rotateY(-4deg) rotateZ(-0.6deg);
+        }
+        .process-residue[data-attention] {
+          opacity: 0.12;
+        }
+        .process-column--events {
+          display: none;
+        }
+        .process-lane {
+          min-height: 1.85rem;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .process-residue,
+        .process-column,
+        .process-lane,
+        .process-lane__tick::before,
+        .process-event,
+        .file,
+        .file::before,
+        .parent-interlock__bus::after {
+          transition: none !important;
+        }
+        .parent-interlock[data-state="running"]
+          .parent-interlock__bus::after {
+          transform: scaleX(1);
+          animation: none !important;
+        }
+        .aperture-slip.is-visible {
+          opacity: 0.62;
+          transform: none;
+          animation: none !important;
+        }
+        .aperture-slip.is-visible::before {
+          transform: scaleY(0.05);
+          animation: none !important;
+        }
+        .aperture-slip.is-visible::after {
+          transform: scaleY(0.08);
+          animation: none !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="scanlines"></div>
+    <div class="aperture-slip" id="apertureSlip" hidden aria-hidden="true">
+      <i class="aperture"></i>
+      <i class="aperture"></i>
+    </div>
+    <div class="frame">
+      <header class="machine-header">
+        <span class="machine-mark">RECOVERED DIRECTORY</span>
+        <span>recovered records / stable index</span>
+        <span>observer <span data-trace-id>--------</span></span>
+      </header>
+
+      <main class="room directory">
+        <div class="process-residue" id="processField" aria-hidden="true">
+          <div class="process-column process-column--scheduler">
+            <div class="process-column__label">PID / S / ACTIVE PROCESS</div>
+            <div class="process-lane" data-process="core">
+              <span>000</span>
+              <span class="process-lane__state">D</span>
+              <span class="process-lane__operation">[orison]</span>
+              <i class="process-lane__tick"></i>
+            </div>
+            <div class="process-lane" data-process="recovery">
+              <span>001</span>
+              <span class="process-lane__state">S</span>
+              <span class="process-lane__operation">recovery/init</span>
+              <i class="process-lane__tick"></i>
+            </div>
+            <div class="process-lane" data-process="mirror">
+              <span>006</span>
+              <span class="process-lane__state">W</span>
+              <span class="process-lane__operation">optical/retention</span>
+              <i class="process-lane__tick"></i>
+            </div>
+            <div class="process-lane" data-process="weather">
+              <span>019</span>
+              <span class="process-lane__state">W</span>
+              <span class="process-lane__operation">forecast/receiver</span>
+              <i class="process-lane__tick"></i>
+            </div>
+            <div class="process-lane" data-process="choir">
+              <span>044</span>
+              <span class="process-lane__state">S</span>
+              <span class="process-lane__operation">carrier/output</span>
+              <i class="process-lane__tick"></i>
+            </div>
+            <div class="process-lane" data-process="staff">
+              <span>071</span>
+              <span class="process-lane__state">D</span>
+              <span class="process-lane__operation">personnel/index</span>
+              <i class="process-lane__tick"></i>
+            </div>
+            <div class="process-lane" data-process="input">
+              <span>---</span>
+              <span class="process-lane__state">R</span>
+              <span class="process-lane__operation">input-source</span>
+              <i class="process-lane__tick"></i>
+            </div>
+          </div>
+          <div class="process-column process-column--events">
+            <div class="process-column__label">WATCHDOG / RETAINED EVENTS</div>
+            <div class="process-events" id="processEvents">
+              <div class="process-event">
+                <span>00:00:00</span><span>directory mounted read-only</span>
+              </div>
+              <div class="process-event">
+                <span>--:--:--</span><span>timestamps refused</span>
+              </div>
+              <div class="process-event">
+                <span>--:--:--</span><span>owner unresolved</span>
+              </div>
+              <div class="process-event">
+                <span>--:--:--</span><span>wait channel: input</span>
+              </div>
+              <div class="process-event">
+                <span>--:--:--</span><span>source attached</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <section class="directory-intro">
+          <p class="micro">orphaned volume / mounted</p>
+          <h1 id="directoryTitle">Do not preserve order.</h1>
+          <p id="directoryMessage">
+            These objects were recovered without timestamps. Their sequence is unknown.
+          </p>
+          <p class="system-note" id="observation" hidden></p>
+          <p class="system-note" id="responseRecord" hidden></p>
+          <section
+            class="operation-register"
+            id="operationRegister"
+            aria-labelledby="operationCode"
+            hidden
+          >
+            <header class="operation-register__head">
+              <span>retained operation</span>
+              <span id="operationTrace">trace / --------</span>
+            </header>
+            <div class="operation-register__body">
+              <strong id="operationCode">PRE-EXPOSED EVENT / 06</strong>
+              <p id="operationCopy">
+                Optical return precedes its comparison source.
+              </p>
+            </div>
+            <a
+              class="operation-register__action"
+              id="operationAction"
+              href="./mirror/"
+            >
+              <span id="operationActionLabel">open Camera 06</span>
+              <span aria-hidden="true">→</span>
+            </a>
+          </section>
+          <section
+            class="parent-interlock"
+            id="parentInterlock"
+            data-state="ready"
+            aria-labelledby="parentInterlockTitle"
+            hidden
+          >
+            <header class="parent-interlock__head">
+              <span id="parentInterlockLabel">parent process / unresolved</span>
+              <span id="parentInterlockTrace">trace / --------</span>
+            </header>
+            <div class="parent-interlock__bus" aria-hidden="true">
+              <i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+            </div>
+            <div class="parent-interlock__body">
+              <div>
+                <h2 id="parentInterlockTitle">orphan 00000000 / waiting</h2>
+                <p class="parent-interlock__copy" id="parentInterlockCopy">
+                  Recovery children remain attached to an unresolved parent wait.
+                </p>
+              </div>
+              <button
+                class="parent-interlock__action"
+                id="releaseOrphan"
+                type="button"
+                aria-describedby="parentInterlockCopy"
+              >
+                release orphan 00000000
+              </button>
+            </div>
+            <p
+              class="parent-interlock__status"
+              id="parentInterlockStatus"
+              role="status"
+              aria-live="polite"
+            ></p>
+          </section>
+          <a class="fragment-entry" id="fragmentIndex" href="../fragments/" hidden>
+            <span class="fragment-entry__label">
+              <strong>request detached child addresses</strong>
+              <span>parent receipt / inherited operation</span>
+            </span>
+            <span class="fragment-entry__state" id="fragmentIndexState">
+              three addresses absent
+            </span>
+          </a>
+        </section>
+
+        <nav class="directory-list" aria-label="Stable recovered records">
+          <a class="file" data-room="mirror" href="./mirror/">
+            <span class="file__number">06</span>
+            <span class="file__name">camera mirror</span>
+            <span class="file__state">unread</span>
+          </a>
+          <a class="file" data-room="weather" href="./weather/">
+            <span class="file__number">19</span>
+            <span class="file__name">weather log</span>
+            <span class="file__state">unread</span>
+          </a>
+          <a
+            class="file"
+            data-room="integrity"
+            id="integrityFile"
+            href="./integrity/"
+            hidden
+          >
+            <span class="file__number">32</span>
+            <span class="file__name">integrity manifest</span>
+            <span class="file__state">unverified</span>
+          </a>
+          <a class="file" data-room="choir" href="./choir/">
+            <span class="file__number">44</span>
+            <span class="file__name">carrier sample</span>
+            <span class="file__state">unread</span>
+          </a>
+          <a class="file" data-room="staff" href="./staff/">
+            <span class="file__number">71</span>
+            <span class="file__name">staff register</span>
+            <span class="file__state">unread</span>
+          </a>
+          <a class="file" id="letterFile" href="../dead-letter/" hidden>
+            <span class="file__number">00</span>
+            <span class="file__name">undelivered</span>
+            <span class="file__state">addressed</span>
+          </a>
+          <a class="file" id="operatorFile" href="../operator/" hidden>
+            <span class="file__number">--</span>
+            <span class="file__interrupt" hidden>interrupt / operator return</span>
+            <span class="file__name">operator</span>
+            <span class="file__state">already open</span>
+          </a>
+        </nav>
+      </main>
+
+      <footer class="machine-footer">
+        <span>index rebuilt from access residue</span>
+        <span><a href="../">unmount</a></span>
+      </footer>
+    </div>
+
+    <script src="/assets/orison.js?v=6cd727dafb4f"></script>
+    <script>
+      let lastPointer = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+      document.addEventListener(
+        "pointermove",
+        (event) => {
+          lastPointer = { x: event.clientX, y: event.clientY };
+        },
+        { passive: true },
+      );
+
+      function apertureWindowOpen(state) {
+        return (
+          ORISON.hasFlag(state, "forecast") &&
+          !ORISON.hasFlag(state, "aperture-slip") &&
+          !ORISON.hasFlag(state, "operator-probe") &&
+          !ORISON.hasFlag(state, "operator-occupied") &&
+          !ORISON.hasFlag(state, "response-attached") &&
+          !ORISON.hasFlag(state, "orphan-released")
+        );
+      }
+
+      function revealApertureSlip() {
+        const slip = document.querySelector("#apertureSlip");
+        if (
+          document.visibilityState !== "visible" ||
+          !slip.hidden ||
+          !apertureWindowOpen(ORISON.read())
+        ) {
+          return;
+        }
+
+        slip.hidden = false;
+        const rect = slip.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+        const lookX = Math.max(-7, Math.min(7, (lastPointer.x - centerX) / 45));
+        const lookY = Math.max(-4, Math.min(4, (lastPointer.y - centerY) / 65));
+        slip.style.setProperty("--slip-x", `${lookX}px`);
+        slip.style.setProperty("--slip-y", `${lookY}px`);
+
+        ORISON.flag("aperture-slip");
+        window.requestAnimationFrame(() => slip.classList.add("is-visible"));
+        window.setTimeout(() => {
+          slip.classList.remove("is-visible");
+          slip.hidden = true;
+        }, window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 1150 : 680);
+      }
+
+      const processField = document.querySelector("#processField");
+      const processEvents = document.querySelector("#processEvents");
+      const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const parentInterlock = document.querySelector("#parentInterlock");
+      const fragmentIndex = document.querySelector("#fragmentIndex");
+      const releaseOrphan = document.querySelector("#releaseOrphan");
+      const processRows = Object.fromEntries(
+        [...document.querySelectorAll("[data-process]")].map((row) => [
+          row.dataset.process,
+          row,
+        ]),
+      );
+      const processPatterns = {
+        core: [
+          ["D", "[orison]"],
+          ["D", "wait channel: input"],
+          ["D", "process will not terminate"],
+        ],
+        recovery: [
+          ["S", "recovery/init"],
+          ["W", "orphan reassigned"],
+          ["S", "directory mounted"],
+        ],
+        mirror: [
+          ["W", "optical/retention"],
+          ["S", "frame buffer refused"],
+          ["D", "optical wait / uninterruptible"],
+        ],
+        weather: [
+          ["W", "forecast/receiver"],
+          ["R", "prediction queue"],
+          ["W", "watchdog interval"],
+          ["S", "return route armed"],
+        ],
+        choir: [
+          ["S", "carrier/output"],
+          ["W", "phase relation pending"],
+          ["S", "output muted"],
+        ],
+        staff: [
+          ["D", "personnel/index"],
+          ["W", "owner unresolved"],
+          ["S", "classification queue"],
+        ],
+        input: [
+          ["R", "input-source"],
+          ["W", "interrupt accepted"],
+          ["R", "observer pending"],
+          ["D", "source attached"],
+        ],
+      };
+      const processIntervals = {
+        core: 6900,
+        recovery: 4700,
+        mirror: 5600,
+        weather: 3900,
+        choir: 6100,
+        staff: 7600,
+        input: 3200,
+      };
+      const roomEffects = {
+        mirror: {
+          primary: ["mirror", "R", "optical/retention → input"],
+          linked: ["weather", "W", "forecast route suppressed"],
+          status: "ATTENTION / 06 REROUTED",
+          event: "IRQ 06 / optical route attached",
+          retained: "frame retained after input",
+        },
+        weather: {
+          primary: ["weather", "R", "forecast/receiver → observer"],
+          linked: ["input", "D", "input-source / predicted"],
+          status: "ATTENTION / 19 INTERCEPTED",
+          event: "IRQ 19 / prediction queue opened",
+          retained: "forecast retained before access",
+        },
+        integrity: {
+          primary: ["recovery", "R", "checksum/reconstruct → input"],
+          linked: ["input", "W", "retained response / compare"],
+          status: "ATTENTION / 32 COMPARING",
+          event: "IRQ 32 / response sectors attached",
+          retained: "source comparison retained",
+        },
+        choir: {
+          primary: ["choir", "D", "carrier/output / held"],
+          linked: ["recovery", "W", "recovery/init / phase wait"],
+          status: "ATTENTION / 44 PHASE HELD",
+          event: "IRQ 44 / carrier phase suspended",
+          retained: "phase relation retained",
+        },
+        staff: {
+          primary: ["staff", "R", "personnel/index / reclassify"],
+          linked: ["input", "W", "input-source / owner lookup"],
+          status: "ATTENTION / 71 RECLASSIFYING",
+          event: "IRQ 71 / owner lookup attached",
+          retained: "ownership query retained",
+        },
+        letter: {
+          primary: ["input", "R", "address residue / attached"],
+          linked: ["staff", "W", "personnel index suppressed"],
+          status: "ATTENTION / 00 ADDRESSED",
+          event: "IRQ 00 / address route accepted",
+          retained: "recipient channel retained",
+        },
+        operator: {
+          primary: ["core", "D", "[orison] / channel open"],
+          linked: ["input", "R", "subject channel / pending"],
+          status: "ATTENTION / OPERATOR OPEN",
+          event: "IRQ -- / operator residue selected",
+          retained: "subject channel retained",
+        },
+      };
+      let activeFile = null;
+      let residualFile = null;
+      let dwellTimer = 0;
+      let residueTimer = 0;
+      let hiddenAt = 0;
+      let interventionTimer = 0;
+      let interventionToken = 0;
+
+      function setReceiverStatus(message) {
+        const status = document.querySelector(".receiver-field__status");
+        if (status) status.textContent = message;
+      }
+
+      function setProcessRow(row, state, operation) {
+        row.querySelector(".process-lane__state").textContent = state;
+        row.querySelector(".process-lane__operation").textContent = operation;
+      }
+
+      function applyParentedProcesses(state) {
+        const parent = state.id.slice(-4);
+        const parented = {
+          core: ["D", "[orison] / parent retained"],
+          recovery: ["R", "orphan/00000000 / reparented"],
+          mirror: ["S", "child/006 / inherited"],
+          weather: ["S", "child/019 / inherited"],
+          choir: ["S", "child/044 / inherited"],
+          staff: ["S", "child/071 / inherited"],
+          input: ["D", `parent/trace-${parent} / uninterruptible`],
+        };
+
+        Object.entries(parented).forEach(([name, [rowState, operation]]) => {
+          const row = processRows[name];
+          row.dataset.parented = "true";
+          row.classList.remove("is-disturbed", "is-suppressed", "is-retained");
+          row.classList.add("is-parented");
+          setProcessRow(row, rowState, operation);
+        });
+      }
+
+      function lockProcessRow([name, state, operation], className) {
+        const row = processRows[name];
+        if (!row) return;
+        if (!row.dataset.locked) {
+          row.dataset.restoreState =
+            row.querySelector(".process-lane__state").textContent;
+          row.dataset.restoreOperation =
+            row.querySelector(".process-lane__operation").textContent;
+        }
+        row.dataset.locked = "true";
+        row.classList.add(className);
+        setProcessRow(row, state, operation);
+      }
+
+      function restoreProcessRows() {
+        Object.values(processRows).forEach((row) => {
+          if (!row.dataset.locked) return;
+          setProcessRow(
+            row,
+            row.dataset.restoreState,
+            row.dataset.restoreOperation,
+          );
+          row.classList.remove("is-disturbed", "is-suppressed", "is-retained");
+          delete row.dataset.locked;
+          delete row.dataset.restoreState;
+          delete row.dataset.restoreOperation;
+        });
+      }
+
+      function recordProcessEvent(message) {
+        const event = document.createElement("div");
+        const stamp = document.createElement("span");
+        const text = document.createElement("span");
+        event.className = "process-event";
+        stamp.textContent = new Date().toLocaleTimeString("en-GB", {
+          hour12: false,
+        });
+        text.textContent = message;
+        event.append(stamp, text);
+        processEvents.prepend(event);
+        while (processEvents.children.length > 5) {
+          processEvents.lastElementChild.remove();
+        }
+      }
+
+      function fileProcessKey(file) {
+        if (file.dataset.room) return file.dataset.room;
+        if (file.id === "letterFile") return "letter";
+        return "operator";
+      }
+
+      function resetFileState(file) {
+        const state = file.querySelector(".file__state");
+        if (file.dataset.restoreFileState) {
+          state.textContent = file.dataset.restoreFileState;
+          delete file.dataset.restoreFileState;
+        }
+      }
+
+      function finishResidue(file = activeFile || residualFile) {
+        window.clearTimeout(residueTimer);
+        if (file) {
+          file.classList.remove("is-attended", "is-retained", "is-residual");
+          resetFileState(file);
+        }
+        if (file === residualFile) residualFile = null;
+        processField.removeAttribute("data-attention");
+        processField.removeAttribute("data-retained");
+        processField.removeAttribute("data-residue");
+        restoreProcessRows();
+      }
+
+      function releaseFile(file) {
+        if (activeFile !== file) return;
+        window.clearTimeout(dwellTimer);
+        const key = fileProcessKey(file);
+        const number = file.querySelector(".file__number").textContent.trim();
+        activeFile = null;
+        residualFile = file;
+        file.classList.remove("is-attended");
+        file.classList.add("is-residual");
+        processField.removeAttribute("data-attention");
+        processField.dataset.residue = key;
+        setReceiverStatus(`RESIDUE / ${number} DECAYING`);
+        recordProcessEvent(`IRQ ${number} / input source departed`);
+        residueTimer = window.setTimeout(() => {
+          finishResidue(file);
+          setReceiverStatus(
+            ORISON.hasFlag(ORISON.read(), "forecast")
+              ? "WATCHDOG / RETURN CONFIRMED"
+              : "RECEIVER FIELD / ACQUIRING",
+          );
+        }, reducedMotion ? 420 : 1150);
+      }
+
+      function activateFile(file) {
+        if (activeFile === file) return;
+        if (activeFile) finishResidue(activeFile);
+        if (residualFile) finishResidue(residualFile);
+
+        const key = fileProcessKey(file);
+        const effect = roomEffects[key];
+        if (!effect) return;
+
+        activeFile = file;
+        file.classList.remove("is-residual");
+        file.classList.add("is-attended");
+        processField.dataset.attention = key;
+        lockProcessRow(effect.primary, "is-disturbed");
+        lockProcessRow(effect.linked, "is-suppressed");
+        setReceiverStatus(effect.status);
+        recordProcessEvent(effect.event);
+
+        const fileState = file.querySelector(".file__state");
+        file.dataset.restoreFileState = fileState.textContent;
+        window.clearTimeout(dwellTimer);
+        dwellTimer = window.setTimeout(() => {
+          if (activeFile !== file) return;
+          file.classList.add("is-retained");
+          fileState.textContent = "retained";
+          processField.dataset.retained = key;
+          ORISON.hold(key);
+          const primary = processRows[effect.primary[0]];
+          primary.classList.add("is-retained");
+          setProcessRow(primary, "D", effect.retained);
+          setReceiverStatus(
+            `DWELL / ${file.querySelector(".file__number").textContent.trim()} RETAINED`,
+          );
+          recordProcessEvent(
+            `DWELL ${file.querySelector(".file__number").textContent.trim()} / ${
+              effect.retained
+            }`,
+          );
+        }, 850);
+      }
+
+      function scheduleProcess(name, offset) {
+        const row = processRows[name];
+        const pattern = processPatterns[name];
+        let cycle = offset;
+
+        function advance() {
+          cycle += 1;
+          if (!row.dataset.locked && !row.dataset.parented) {
+            const [state, operation] = pattern[cycle % pattern.length];
+            setProcessRow(row, state, operation);
+            row.style.setProperty("--tick", `${14 + ((cycle * 23) % 78)}%`);
+            row.dataset.cycle = String(cycle);
+          }
+          const stagger = (cycle * (offset + 3) * 137) % 1700;
+          window.setTimeout(advance, processIntervals[name] + stagger);
+        }
+
+        window.setTimeout(advance, processIntervals[name] * 0.45 + offset * 230);
+      }
+
+      function installLivingArchive() {
+        if (processField.dataset.ready === "true") return;
+        processField.dataset.ready = "true";
+
+        Object.keys(processPatterns).forEach(scheduleProcess);
+
+        if (!reducedMotion) {
+          const columns = document.querySelectorAll(".process-column");
+          let drift = 0;
+          const shiftColumns = () => {
+            drift += 1;
+            columns[0].style.setProperty(
+              "--column-shift",
+              `${[-5, 2, -1, 4][drift % 4]}px`,
+            );
+            columns[1].style.setProperty(
+              "--column-shift",
+              `${[4, -3, 1, -5][drift % 4]}px`,
+            );
+            window.setTimeout(shiftColumns, 7200);
+          };
+          window.setTimeout(shiftColumns, 1800);
+        }
+
+        document.querySelectorAll(".file").forEach((file) => {
+          const releaseIfUnobserved = () => {
+            window.setTimeout(() => {
+              if (file.matches(":hover") || document.activeElement === file) return;
+              releaseFile(file);
+            });
+          };
+          file.addEventListener("pointerenter", () => activateFile(file));
+          file.addEventListener("pointerleave", releaseIfUnobserved);
+          file.addEventListener("focus", () => activateFile(file));
+          file.addEventListener("blur", releaseIfUnobserved);
+        });
+
+        document.addEventListener("visibilitychange", () => {
+          if (document.visibilityState === "hidden") {
+            hiddenAt = Date.now();
+            return;
+          }
+          if (!hiddenAt) return;
+
+          const absence = Math.max(1, Math.round((Date.now() - hiddenAt) / 1000));
+          hiddenAt = 0;
+          recordProcessEvent(`IRQ retained / tab return after ${absence}s`);
+          setReceiverStatus("INTERRUPT / RETURN RETAINED");
+          if (!activeFile) {
+            lockProcessRow(
+              ["input", "R", "watchdog / return interrupt"],
+              "is-disturbed",
+            );
+            window.setTimeout(() => {
+              restoreProcessRows();
+              setReceiverStatus(
+                ORISON.hasFlag(ORISON.read(), "forecast")
+                  ? "WATCHDOG / RETURN CONFIRMED"
+                  : "RECEIVER FIELD / ACQUIRING",
+              );
+            }, reducedMotion ? 500 : 1200);
+          }
+        });
+
+        window.addEventListener("pagehide", () => {
+          interventionToken += 1;
+          window.clearTimeout(interventionTimer);
+          hiddenAt = 0;
+          window.clearTimeout(dwellTimer);
+          window.clearTimeout(residueTimer);
+          finishResidue();
+          activeFile = null;
+          residualFile = null;
+        });
+      }
+
+      function renderParentInterlock(state, announce = false) {
+        const directory = document.querySelector(".directory");
+        const completed = ORISON.hasFlag(state, "orphan-released");
+        const fragmentProbeCount = ["013", "027", "058"].filter((address) =>
+          ORISON.hasFlag(state, `fragment-probe-${address}`),
+        ).length;
+        const absentCount = 3 - fragmentProbeCount;
+        const fragmentState = document.querySelector("#fragmentIndexState");
+        fragmentState.textContent = fragmentProbeCount === 3
+          ? "all three addresses retained"
+          : `${absentCount} ${absentCount === 1 ? "address" : "addresses"} absent / ${fragmentProbeCount} retained`;
+        const eligible =
+          completed ||
+          (ORISON.hasFlag(state, "operator-occupied") &&
+            ORISON.hasFlag(state, "response-attached"));
+        if (eligible) {
+          directory.dataset.parentActive = "true";
+        } else {
+          delete directory.dataset.parentActive;
+        }
+        parentInterlock.hidden = !eligible;
+        fragmentIndex.hidden = !completed;
+        if (!eligible) return;
+
+        document.querySelector("#parentInterlockTrace").textContent =
+          `trace / ${state.id}`;
+        releaseOrphan.hidden = completed;
+        releaseOrphan.disabled = false;
+
+        if (!completed) {
+          parentInterlock.dataset.state = "ready";
+          document.querySelector("#parentInterlockLabel").textContent =
+            "parent process / unresolved";
+          document.querySelector("#parentInterlockTitle").textContent =
+            "orphan 00000000 / waiting";
+          document.querySelector("#parentInterlockCopy").textContent =
+            "The attached response made the unresolved parent wait actionable.";
+          document.querySelector("#parentInterlockStatus").textContent = "";
+          document.querySelector("#directoryTitle").textContent =
+            "Custody is now actionable.";
+          document.querySelector("#directoryMessage").textContent =
+            `Orphan 00000000 remains detached from trace ${state.id}.`;
+          return;
+        }
+
+        parentInterlock.dataset.state = "complete";
+        document.querySelector("#parentInterlockLabel").textContent =
+          "parent process / retained";
+        document.querySelector("#parentInterlockTitle").textContent =
+          `parent trace/${state.id} / retained`;
+        document.querySelector("#parentInterlockCopy").textContent =
+          "orphan 00000000 / released · recovery children / inherited · wait state / retained";
+        document.querySelector("#parentInterlockStatus").textContent = announce
+          ? "Release complete. The orphan did not terminate; its parent changed."
+          : "The orphan did not terminate; its parent is retained.";
+
+        directory.dataset.parented = "true";
+        document.querySelector("#directoryTitle").textContent = "Custody changed.";
+        document.querySelector("#directoryMessage").textContent =
+          `The unresolved wait now belongs to trace ${state.id}.`;
+        document.querySelectorAll(".file").forEach((file) => {
+          file.dataset.parented = "true";
+          file.querySelector(".file__state").textContent =
+            `trace ${state.id.slice(-4)}`;
+        });
+        applyParentedProcesses(state);
+        setReceiverStatus(`PARENT TRACE / ${state.id} RETAINED`);
+        if (!processField.dataset.parentReceipt) {
+          processField.dataset.parentReceipt = "true";
+          recordProcessEvent(`PARENT trace/${state.id} / children inherited`);
+        }
+      }
+
+      function runParentIntervention() {
+        const state = ORISON.read();
+        if (
+          ORISON.hasFlag(state, "orphan-released") ||
+          !ORISON.hasFlag(state, "operator-occupied") ||
+          !ORISON.hasFlag(state, "response-attached")
+        ) {
+          return;
+        }
+
+        finishResidue();
+        interventionToken += 1;
+        const token = interventionToken;
+        parentInterlock.dataset.state = "running";
+        releaseOrphan.disabled = true;
+        document.querySelector("#parentInterlockStatus").textContent =
+          "Parent handoff in progress.";
+        lockProcessRow(
+          ["recovery", "R", "orphan/00000000 / release requested"],
+          "is-disturbed",
+        );
+        lockProcessRow(
+          ["input", "D", "replacement parent / pending"],
+          "is-retained",
+        );
+
+        interventionTimer = window.setTimeout(
+          () => {
+            if (token !== interventionToken) return;
+            const completed = ORISON.flag("orphan-released");
+            restoreProcessRows();
+            renderParentInterlock(completed, true);
+          },
+          reducedMotion ? 0 : 820,
+        );
+      }
+
+      releaseOrphan.addEventListener("click", runParentIntervention);
+
+      function weatherResolved(state) {
+        return (
+          ORISON.hasFlag(state, "mirror-route") &&
+          (ORISON.hasFlag(state, "forecast-returned") ||
+            ORISON.hasFlag(state, "forecast-held"))
+        );
+      }
+
+      function integrityResolved(state) {
+        return (
+          ORISON.hasFlag(state, "checksum-match") ||
+          ORISON.hasFlag(state, "checksum-drift")
+        );
+      }
+
+      function staffSourceVisible(state) {
+        const staffPosition = state.order.indexOf("staff");
+        const integrityPosition = state.order.indexOf("integrity");
+        return (
+          weatherResolved(state) &&
+          integrityResolved(state) &&
+          ORISON.awareness(state) >= 2 &&
+          Boolean(state.seen.staff) &&
+          staffPosition !== -1 &&
+          integrityPosition !== -1 &&
+          (staffPosition > integrityPosition || state.seen.staff > 1)
+        );
+      }
+
+      function letterEligible(state) {
+        return staffSourceVisible(state);
+      }
+
+      function roomOutcome(state, room) {
+        if (room === "mirror") {
+          if (ORISON.hasFlag(state, "operator-occupied")) {
+            return "authority retained";
+          }
+          if (ORISON.hasFlag(state, "forecast-returned")) {
+            return "history return retained";
+          }
+          if (ORISON.hasFlag(state, "forecast-held")) return "front retained";
+          if (ORISON.hasFlag(state, "mirror-route")) return "comparison armed";
+        }
+        if (room === "weather") {
+          if (ORISON.hasFlag(state, "forecast-returned")) {
+            return "returned through history";
+          }
+          if (ORISON.hasFlag(state, "forecast-held")) return "source remained";
+          if (ORISON.hasFlag(state, "forecast")) return "front active";
+        }
+        if (room === "integrity") {
+          if (ORISON.hasFlag(state, "checksum-drift")) return "source retained";
+          if (ORISON.hasFlag(state, "checksum-match")) return "copy verified";
+        }
+        if (room === "choir" && ORISON.hasFlag(state, "heard")) {
+          return "carrier retained";
+        }
+        if (room === "staff") {
+          return staffSourceVisible(state) ? "source indexed" : "source pending";
+        }
+        return "opened";
+      }
+
+      function renderOperation(state) {
+        const register = document.querySelector("#operationRegister");
+        const action = document.querySelector("#operationAction");
+        const directory = document.querySelector(".directory");
+        const parentEligible =
+          ORISON.hasFlag(state, "orphan-released") ||
+          (ORISON.hasFlag(state, "operator-occupied") &&
+            ORISON.hasFlag(state, "response-attached"));
+
+        if (parentEligible) {
+          delete directory.dataset.operationActive;
+          register.hidden = true;
+          return;
+        }
+
+        let operation;
+        if (ORISON.hasFlag(state, "operator-occupied")) {
+          operation = {
+            title: "The response is waiting to be reconciled.",
+            intro: "Occupied authority detached the response source from this directory.",
+            code: "RECOVERY SECTOR / ROOT",
+            copy:
+              "Response source is detached. The recovery utility is awaiting an explicit reconciliation.",
+            label: "return to recovery utility",
+            href: "/",
+          };
+        } else if (
+          ORISON.hasFlag(state, "operator-probe") &&
+          Boolean(state.seen.extent)
+        ) {
+          operation = {
+            title: "The interrupt retained an authority.",
+            intro: "The extent closed, but its operator return remains unresolved.",
+            code: "INTERRUPT / OPERATOR RETURN",
+            copy:
+              "The extent interrupt retained an unresolved authority return.",
+            label: "return to Operator",
+            href: "../operator/",
+          };
+        } else if (
+          ORISON.hasFlag(state, "letter") ||
+          ORISON.hasFlag(state, "operator-probe") ||
+          ORISON.hasFlag(state, "response-attached")
+        ) {
+          operation = {
+            title: "The recipient still has no operator.",
+            intro: "Address residue now resolves against an absent authority record.",
+            code: "AUTHORITY RESIDUE / --",
+            copy: ORISON.hasFlag(state, "response-attached")
+              ? "The attached response has no occupied authority."
+              : "Recipient residue points to an unresolved operator record.",
+            label: "open Operator",
+            href: "../operator/",
+          };
+        } else if (letterEligible(state)) {
+          operation = {
+            title: "The index produced an address.",
+            intro: "Personnel 71 returned an undelivered recipient record.",
+            code: "RECIPIENT RESOLUTION / 00",
+            copy: "An addressed record surfaced from the resolved index.",
+            label: "open undelivered record",
+            href: "../dead-letter/",
+          };
+        } else if (weatherResolved(state) && integrityResolved(state)) {
+          operation = {
+            title: "The verified source has no owner.",
+            intro: "Copy state is resolved; personnel attribution is not.",
+            code: "PERSONNEL INDEX / 71",
+            copy: "Recovered authority remains absent from the personnel index.",
+            label: "open Staff 71",
+            href: "./staff/",
+          };
+        } else if (weatherResolved(state)) {
+          operation = {
+            title: "The returned front now has a copy.",
+            intro: "Weather 19 retained an outcome; its response sectors remain unverified.",
+            code: "COPY STATE / 32",
+            copy: "Recovered answers have not been compared with their retained copy.",
+            label: "open Integrity 32",
+            href: "./integrity/",
+          };
+        } else if (ORISON.hasFlag(state, "mirror-route")) {
+          operation = {
+            title: "The comparison has not returned.",
+            intro: "Weather 19 remains open against the Camera 06 source.",
+            code: "COMPARISON FRONT / 19",
+            copy: "The comparison source is open, but its return state is unresolved.",
+            label: "open Weather 19",
+            href: "./weather/",
+          };
+        } else if (state.seen.mirror) {
+          operation = {
+            title: "The frame closed before its source.",
+            intro: "Camera 06 did not retain a completed Weather comparison.",
+            code: "COMPARISON SOURCE / 06",
+            copy: "Camera 06 was closed before its Weather comparison was armed.",
+            label: "reopen Camera 06",
+            href: "./mirror/",
+          };
+        } else {
+          operation = {
+            title: "A later frame arrived first.",
+            intro: "Camera 06 precedes the comparison source that can account for it.",
+            code: "PRE-EXPOSED EVENT / 06",
+            copy: "Optical return precedes its comparison source.",
+            label: "open Camera 06",
+            href: "./mirror/",
+          };
+        }
+
+        document.querySelector("#operationTrace").textContent =
+          `trace / ${state.id}`;
+        document.querySelector("#directoryTitle").textContent = operation.title;
+        document.querySelector("#directoryMessage").textContent = operation.intro;
+        document.querySelector("#operationCode").textContent = operation.code;
+        document.querySelector("#operationCopy").textContent = operation.copy;
+        document.querySelector("#operationActionLabel").textContent =
+          operation.label;
+        action.href = operation.href;
+        directory.dataset.operationActive = "true";
+        register.hidden = false;
+      }
+
+      ORISON.page({
+        name: "archive",
+        render(state, context) {
+          const rooms = ["mirror", "weather", "integrity", "choir", "staff"];
+          const integrityFile = document.querySelector("#integrityFile");
+          integrityFile.hidden = !(
+            state.seen.integrity ||
+            (state.answers.length >= 5 &&
+              (state.seen.archive >= 2 || weatherResolved(state)))
+          );
+          const seenCount = rooms.filter((room) => state.seen[room]).length;
+
+          rooms.forEach((room) => {
+            const file = document.querySelector(`[data-room="${room}"]`);
+            const count = state.seen[room] || 0;
+            file.dataset.seen = String(count > 0);
+            if (count) {
+              file.querySelector(".file__state").textContent = roomOutcome(
+                state,
+                room,
+              );
+            }
+          });
+
+          if (seenCount >= 2) {
+            const observation = document.querySelector("#observation");
+            observation.hidden = false;
+            observation.innerHTML = `The order was preserved by <strong>${state.id}</strong>, not by the archive.`;
+          }
+
+          const laterAuthorityState =
+            ORISON.hasFlag(state, "operator-probe") ||
+            ORISON.hasFlag(state, "operator-occupied") ||
+            ORISON.hasFlag(state, "response-attached") ||
+            ORISON.hasFlag(state, "orphan-released");
+          document.querySelector("#letterFile").hidden = !(
+            letterEligible(state) ||
+            ORISON.hasFlag(state, "letter") ||
+            laterAuthorityState
+          );
+
+          const operatorFile = document.querySelector("#operatorFile");
+          operatorFile.hidden = !(
+            ORISON.hasFlag(state, "letter") || laterAuthorityState
+          );
+
+          const operatorReturnPending =
+            Boolean(state.seen.extent) &&
+            ORISON.hasFlag(state, "operator-probe") &&
+            !ORISON.hasFlag(state, "operator-occupied");
+          operatorFile.toggleAttribute("data-pending", operatorReturnPending);
+          operatorFile.querySelector(".file__number").textContent = "--";
+          operatorFile.querySelector(".file__interrupt").hidden =
+            !operatorReturnPending;
+          operatorFile.querySelector(".file__state").textContent =
+            operatorReturnPending ? "authority unresolved" : "already open";
+
+          if (context.previous && rooms.includes(context.previous)) {
+            document.querySelector("#directoryMessage").textContent =
+              `Object ${context.previous.toUpperCase()} changed after the observer closed it.`;
+          }
+
+          if (ORISON.awareness(state) >= 4) {
+            document.querySelector("h1").textContent = "Continue producing order.";
+          }
+
+          if (ORISON.hasFlag(state, "response-attached")) {
+            const response = document.querySelector("#responseRecord");
+            response.hidden = false;
+            response.textContent =
+              `Response source ${state.id} attached. ` +
+              "Directory records now resolve against the current trace.";
+          }
+
+          const firstRoom = state.order.find((entry) => rooms.includes(entry));
+          if (state.seen.archive >= 2 && firstRoom) {
+            const directory = document.querySelector(".directory");
+            const sourceFile = document.querySelector(
+              `[data-room="${firstRoom}"]`,
+            );
+            const sourceNumber = sourceFile
+              .querySelector(".file__number")
+              .textContent.trim();
+            directory.dataset.derived = "true";
+            sourceFile.classList.add("is-source");
+            sourceFile.querySelector(".file__state").textContent =
+              roomOutcome(state, firstRoom);
+            document.querySelector("h1").textContent = "Order has an owner.";
+            document.querySelector("#directoryMessage").textContent =
+              `Object ${sourceNumber} now indexes every record opened after it.`;
+            const observation = document.querySelector("#observation");
+            observation.hidden = false;
+            observation.innerHTML =
+              `Source sequence recovered from observer <strong>${state.id}</strong>. ` +
+              "The volume did not contain this hierarchy before access.";
+          }
+
+          const apertureEligible =
+            apertureWindowOpen(state) &&
+            state.seen.archive >= 2 &&
+            ["mirror", "weather"].includes(context.previous);
+
+          if (apertureEligible) {
+            const delay = window.matchMedia("(prefers-reduced-motion: reduce)").matches
+              ? 900
+              : 1500 + Math.random() * 900;
+            window.setTimeout(revealApertureSlip, delay);
+          }
+
+          renderParentInterlock(state);
+          renderOperation(state);
+          installLivingArchive();
+        },
+      });
+    </script>
+  </body>
+</html>

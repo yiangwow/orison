@@ -1,0 +1,472 @@
+<!doctype html>
+<html lang="en" class="state-pending">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>camera 06 / mirror test</title>
+    <link rel="stylesheet" href="/assets/base.css?v=8d65c5a18cc9" />
+    <style>
+      .state-pending .frame {
+        visibility: hidden;
+      }
+
+      .mirror-room {
+        display: grid;
+        grid-template-columns: minmax(280px, 1fr) minmax(230px, 0.45fr);
+        gap: clamp(2rem, 6vw, 7rem);
+        align-items: center;
+      }
+
+      .monitor {
+        position: relative;
+        aspect-ratio: 4 / 3;
+        overflow: hidden;
+        border: 1px solid rgba(123, 141, 152, 0.3);
+        background:
+          radial-gradient(circle at 50% 42%, rgba(123, 141, 152, 0.1), transparent 24%),
+          #05090b;
+        box-shadow: inset 0 0 90px rgba(123, 141, 152, 0.08);
+      }
+
+      .monitor::before {
+        content: "CAM 06  /  03:17:09  /  INPUT LOST";
+        position: absolute;
+        top: 0.7rem;
+        left: 0.8rem;
+        z-index: 3;
+        color: rgba(205, 216, 209, 0.6);
+        font-size: 8px;
+        letter-spacing: 0.1em;
+      }
+
+      .monitor::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        z-index: 2;
+        background: repeating-linear-gradient(
+          to right,
+          transparent 0,
+          transparent 13%,
+          rgba(123, 141, 152, 0.025) 13.2%
+        );
+        pointer-events: none;
+      }
+
+      #mirrorSignal {
+        width: 100%;
+        height: 100%;
+        filter: blur(0.2px) contrast(1.35);
+        transition: opacity 700ms ease;
+      }
+
+      .prevision-frame {
+        position: absolute;
+        inset: 3.2rem 1.2rem 1.2rem;
+        z-index: 1;
+        display: grid;
+        grid-template-rows: auto 1fr auto;
+        color: rgba(205, 216, 209, 0.72);
+        font-size: 8px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+
+      .prevision-frame[hidden] {
+        display: none;
+      }
+
+      .prevision-map {
+        align-self: center;
+        width: 100%;
+        min-height: 12rem;
+        overflow: visible;
+      }
+
+      .prevision-axis,
+      .prevision-path,
+      .prevision-gate {
+        fill: none;
+        vector-effect: non-scaling-stroke;
+      }
+
+      .prevision-axis {
+        stroke: rgba(123, 141, 152, 0.2);
+        stroke-width: 1;
+      }
+
+      .prevision-path {
+        stroke: rgba(205, 216, 209, 0.44);
+        stroke-width: 1;
+        stroke-dasharray: 3 8;
+        animation: prevision-retain 8s linear infinite;
+      }
+
+      .prevision-gate {
+        stroke: var(--red);
+        stroke-width: 1;
+      }
+
+      .prevision-node {
+        fill: var(--black);
+        stroke: rgba(205, 216, 209, 0.62);
+        stroke-width: 1;
+      }
+
+      .prevision-node--future {
+        fill: rgba(255, 64, 80, 0.22);
+        stroke: var(--red);
+      }
+
+      .prevision-data {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 1rem;
+        padding-top: 0.7rem;
+        border-top: 1px solid rgba(123, 141, 152, 0.24);
+      }
+
+      .prevision-data strong {
+        color: var(--red);
+        font-weight: 400;
+      }
+
+      @keyframes prevision-retain {
+        to {
+          stroke-dashoffset: -44;
+        }
+      }
+
+      .behavior-frame {
+        position: absolute;
+        inset: 3.2rem 1.2rem 1.2rem;
+        z-index: 1;
+        display: grid;
+        grid-template-rows: auto 1fr auto;
+        color: rgba(205, 216, 209, 0.76);
+        font-size: 8px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+
+      .behavior-frame[hidden] {
+        display: none;
+      }
+
+      .behavior-route {
+        display: grid;
+        align-content: center;
+        gap: 0.35rem;
+        margin: 1rem 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      .behavior-route li {
+        display: grid;
+        grid-template-columns: 2.5rem minmax(0, 1fr);
+        padding: 0.42rem 0;
+        border-bottom: 1px solid rgba(123, 141, 152, 0.16);
+      }
+
+      .behavior-route li:last-child {
+        color: var(--receiver);
+      }
+
+      .behavior-metrics {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0.75rem;
+        margin: 0;
+      }
+
+      .behavior-metrics div {
+        border-top: 1px solid rgba(123, 141, 152, 0.24);
+        padding-top: 0.5rem;
+      }
+
+      .behavior-metrics dt {
+        color: var(--dim);
+      }
+
+      .behavior-metrics dd {
+        margin: 0.25rem 0 0;
+        color: var(--bone);
+        font: 1.2rem var(--serif);
+        letter-spacing: 0;
+      }
+
+      .mirror-room[data-reconstruction="behavior"] {
+        grid-template-columns: minmax(210px, 0.42fr) minmax(360px, 1fr);
+        align-items: stretch;
+      }
+
+      .mirror-room[data-reconstruction="behavior"] .monitor {
+        min-height: min(72vh, 720px);
+        aspect-ratio: auto;
+        border-color: rgba(85, 217, 120, 0.34);
+      }
+
+      .mirror-room[data-reconstruction="behavior"] #mirrorSignal {
+        opacity: 0.09;
+      }
+
+      .monitor-label {
+        position: absolute;
+        right: 0.8rem;
+        bottom: 0.7rem;
+        z-index: 3;
+        color: var(--red);
+        font-size: 8px;
+        letter-spacing: 0.1em;
+      }
+
+      .mirror-copy h1 {
+        margin: 1rem 0 2rem;
+        font: 400 clamp(3rem, 5vw, 4.5rem) / 0.86 var(--serif);
+        letter-spacing: -0.06em;
+      }
+
+      .mirror-copy p {
+        color: var(--dim);
+      }
+
+      .compare {
+        display: inline-block;
+        margin-top: 2rem;
+        padding: 0.7rem 0;
+        border-top: 1px solid var(--faint);
+        color: var(--bone);
+        font-size: 9px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+
+      .compare.is-secondary {
+        color: var(--dim);
+      }
+
+      @media (max-width: 720px) {
+        .mirror-room {
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+        }
+        .monitor {
+          width: 100%;
+        }
+        .mirror-room[data-reconstruction="behavior"] .monitor {
+          min-height: 28rem;
+        }
+        .behavior-frame {
+          inset-inline: 0.8rem;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        #mirrorSignal {
+          transition: none !important;
+        }
+        .prevision-path {
+          animation: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="scanlines"></div>
+    <div class="frame">
+      <header class="machine-header">
+        <span class="machine-mark">OPTICAL RETENTION TEST</span>
+        <span>camera permission: not requested</span>
+        <span>object 06</span>
+      </header>
+
+      <main class="room mirror-room">
+        <div class="monitor">
+          <canvas id="mirrorSignal" aria-label="Camera six reconstruction"></canvas>
+          <div class="prevision-frame" id="previsionFrame" aria-hidden="true">
+            <span>pre-exposed sequence / event 19</span>
+            <svg class="prevision-map" viewBox="0 0 600 300" preserveAspectRatio="none">
+              <path class="prevision-axis" d="M25 150 H575 M300 30 V270" />
+              <path class="prevision-path" d="M25 188 C116 188 128 91 218 91 S336 226 430 226 S503 126 575 126" />
+              <path class="prevision-gate" d="M430 38 V262" />
+              <circle class="prevision-node" cx="218" cy="91" r="8" />
+              <circle class="prevision-node prevision-node--future" cx="430" cy="226" r="10" />
+            </svg>
+            <div class="prevision-data">
+              <span id="previsionEvent">history return / not yet observed</span>
+              <strong id="previsionOffset">T+00:14</strong>
+            </div>
+          </div>
+          <div class="behavior-frame" id="behaviorFrame" hidden>
+            <span>frame source / retained access sequence</span>
+            <ol class="behavior-route" id="behaviorRoute"></ol>
+            <dl class="behavior-metrics">
+              <div><dt>returns</dt><dd id="behaviorReturns">0</dd></div>
+              <div><dt>answers</dt><dd id="behaviorAnswers">0</dd></div>
+              <div><dt>attention loss</dt><dd id="behaviorFocus">none</dd></div>
+            </dl>
+          </div>
+          <span class="monitor-label" id="monitorLabel">NO SUBJECT</span>
+        </div>
+
+        <section class="mirror-copy">
+          <p class="micro">maintenance record / mirror alignment</p>
+          <h1 id="mirrorTitle">A later frame arrived first.</h1>
+          <p id="mirrorText">
+            Camera 06 retained a return event fourteen seconds before Weather 19
+            could record it. The source frame is absent.
+          </p>
+          <p class="system-note" id="mirrorRevision" hidden></p>
+          <section class="handoff-record" id="mirrorHandoff" hidden>
+            <div class="handoff-record__result">
+              <span id="mirrorHandoffState">Weather 19 / return retained</span>
+              <strong>Camera 06 retained the completed front.</strong>
+            </div>
+            <a class="handoff-record__action" href="../">
+              <span>return retained frame to recovered directory</span>
+              <span aria-hidden="true">→</span>
+            </a>
+          </section>
+          <a class="compare" id="compareLink" href="../weather/">
+            open Weather 19 comparison →
+          </a>
+          <br />
+          <a class="return-link" id="mirrorReturn" href="../">close object</a>
+        </section>
+      </main>
+
+      <footer class="machine-footer">
+        <span>image reconstruction incomplete</span>
+        <span>trace <span data-trace-id>--------</span></span>
+      </footer>
+    </div>
+
+    <script src="/assets/orison.js?v=6cd727dafb4f"></script>
+    <script>
+      ORISON.drawSignal(document.querySelector("#mirrorSignal"), "mirror");
+      document.querySelector("#compareLink").addEventListener("click", () => {
+        ORISON.flag("mirror-route");
+      });
+
+      ORISON.page({
+        name: "mirror",
+        render(state, context) {
+          const room = document.querySelector(".mirror-room");
+          const behaviorFrame = document.querySelector("#behaviorFrame");
+          const previsionFrame = document.querySelector("#previsionFrame");
+          const retainedWeatherReturn =
+            ORISON.hasFlag(state, "forecast") && context.previous === "weather";
+          const weatherReturned =
+            retainedWeatherReturn || ORISON.hasFlag(state, "forecast-returned");
+          const weatherHeld = ORISON.hasFlag(state, "forecast-held");
+
+          delete room.dataset.reconstruction;
+          behaviorFrame.hidden = true;
+          previsionFrame.hidden = false;
+          if (retainedWeatherReturn) ORISON.flag("forecast-returned");
+
+          if (ORISON.hasFlag(state, "forecast")) {
+            document.querySelector("#monitorLabel").textContent = "2 SUBJECTS";
+            document.querySelector("#previsionEvent").textContent =
+              "history return / retained";
+            document.querySelector("#previsionOffset").textContent = "EVENT HELD";
+            document.querySelector("#mirrorTitle").textContent =
+              "The camera did not change.";
+            document.querySelector("#mirrorText").textContent =
+              "The original frame has been reclassified. A second subject was present before the image was opened.";
+            const revision = document.querySelector("#mirrorRevision");
+            revision.hidden = false;
+            revision.innerHTML = `Subject 02 entered by backward navigation. Return count: <strong>${ORISON.countLabel(state.returns, 7)}</strong>.`;
+          }
+
+          if (weatherReturned || weatherHeld) {
+            document.querySelector("#mirrorHandoff").hidden = false;
+            document.querySelector("#mirrorHandoffState").textContent = weatherHeld
+              ? "Weather 19 / source retained"
+              : "Weather 19 / history return retained";
+            document.querySelector("#mirrorReturn").hidden = true;
+            const comparison = document.querySelector("#compareLink");
+            comparison.classList.add("is-secondary");
+            comparison.textContent = "reopen Weather 19 comparison";
+          }
+
+          if (state.seen.mirror >= 3 && !retainedWeatherReturn) {
+            document.querySelector("#monitorLabel").textContent = `SUBJECT ${state.id}`;
+            document.querySelector("#mirrorTitle").textContent =
+              "It no longer requires an image.";
+          }
+
+          if (
+            ORISON.hasFlag(state, "operator-probe") &&
+            state.seen.mirror >= 2 &&
+            !retainedWeatherReturn
+          ) {
+            const route = document.querySelector("#behaviorRoute");
+            room.dataset.reconstruction = "behavior";
+            behaviorFrame.hidden = false;
+            previsionFrame.hidden = true;
+            route.replaceChildren();
+
+            const routeLabels = {
+              root: "terminal",
+              inode: "recovery inode",
+              exam: "examination",
+              archive: "directory",
+              mirror: "camera 06",
+              weather: "weather 19",
+              integrity: "manifest 32",
+              choir: "carrier 44",
+              staff: "register 71",
+              letter: "dead letter",
+              operator: "operator",
+            };
+            state.order.forEach((entry, index) => {
+              const item = document.createElement("li");
+              const sequence = document.createElement("span");
+              const label = document.createElement("span");
+              sequence.textContent = String(index + 1).padStart(2, "0");
+              label.textContent = routeLabels[entry] || entry;
+              item.append(sequence, label);
+              route.append(item);
+            });
+
+            document.querySelector("#behaviorReturns").textContent =
+              ORISON.countLabel(state.returns, 7);
+            document.querySelector("#behaviorAnswers").textContent =
+              state.answers.length;
+            document.querySelector("#behaviorFocus").textContent =
+              ORISON.attentionLabel(state.attention);
+            document.querySelector("#monitorLabel").textContent = "INPUT SOURCE";
+            document.querySelector("#mirrorTitle").textContent =
+              "Optical source no longer required.";
+            document.querySelector("#mirrorText").textContent =
+              "Camera 06 reconstructed a subject from the order in which records were opened. No camera permission was requested. No image was captured.";
+            const revision = document.querySelector("#mirrorRevision");
+            revision.hidden = false;
+            revision.innerHTML =
+              `Frame designation <strong>${state.id}</strong> is behavioral, not optical.`;
+
+            if (ORISON.hasFlag(state, "operator-occupied")) {
+              document.querySelector("#monitorLabel").textContent = "AUTHORITY FIELD";
+              document.querySelector("#mirrorTitle").textContent =
+                "She does not require the image.";
+              document.querySelector("#mirrorText").textContent =
+                "Camera 06 retained the route as an operator boundary. The optical source remains absent.";
+              revision.innerHTML =
+                `Authority reference <strong>SHE</strong> resolves before frame <strong>${state.id}</strong>.`;
+            }
+          }
+
+          document.documentElement.classList.remove("state-pending");
+        },
+      });
+
+      window.addEventListener("pagehide", () => {
+        document.documentElement.classList.add("state-pending");
+      });
+    </script>
+  </body>
+</html>

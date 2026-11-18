@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>erase local trace</title>
+    <link rel="stylesheet" href="/assets/base.css?v=8d65c5a18cc9" />
+    <style>
+      .erase {
+        position: relative;
+        z-index: 1;
+        display: grid;
+        place-content: center;
+        min-height: 100vh;
+        padding: 2rem;
+        text-align: center;
+      }
+      .erase h1 {
+        margin: 0 0 1rem;
+        font: 400 clamp(3rem, 10vw, 7rem) / 0.85 var(--serif);
+      }
+      .erase p {
+        max-width: 35rem;
+        color: var(--dim);
+      }
+      .erase button {
+        margin: 2rem auto 0;
+        padding: 0.8rem 1rem;
+        border: 1px solid var(--red);
+        background: none;
+        color: var(--red);
+        cursor: pointer;
+      }
+      .erase .return {
+        margin-top: 0;
+        padding: 0;
+        border: 0;
+        color: var(--dim);
+        text-decoration: underline;
+        text-underline-offset: 0.28em;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="erase">
+      <h1>Erase local trace?</h1>
+      <p>
+        This removes ORISON-controlled local narrative storage and expires any
+        legacy trace cookie. Ordinary network access logs and copied witness
+        invitations are outside this erasure boundary.
+      </p>
+      <button id="erase" type="button">erase local trace</button>
+      <p><button class="return" id="return" type="button">return without erasing</button></p>
+    </main>
+    <script src="/assets/orison.js?v=6cd727dafb4f"></script>
+    <script>
+      ORISON.renderRecoveryField(ORISON.read());
+      document.querySelector("#erase").addEventListener("click", ORISON.reset);
+      document.querySelector("#return").addEventListener("click", () => history.back());
+    </script>
+  </body>
+</html>

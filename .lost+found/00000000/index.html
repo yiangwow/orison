@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>inode 00000000</title>
+    <link rel="stylesheet" href="/assets/base.css?v=8d65c5a18cc9" />
+    <style>
+      .frame {
+        width: min(1600px, calc(100% - 4rem));
+      }
+
+      .inode-room {
+        display: grid;
+        grid-template-columns: minmax(220px, 1fr) minmax(380px, 680px) minmax(220px, 1fr);
+        align-items: center;
+        gap: clamp(2rem, 5vw, 7rem);
+      }
+
+      .specimen {
+        position: relative;
+        aspect-ratio: 1;
+        border: 1px solid var(--faint);
+        background:
+          linear-gradient(90deg, transparent 49.8%, var(--faint) 50%, transparent 50.2%),
+          linear-gradient(transparent 49.8%, var(--faint) 50%, transparent 50.2%);
+        box-shadow:
+          0 0 0 1px rgba(85, 217, 120, 0.025),
+          0 0 90px rgba(85, 217, 120, 0.035);
+      }
+
+      .specimen::before,
+      .specimen::after {
+        content: "";
+        position: absolute;
+        inset: 11%;
+        z-index: 2;
+        border: 1px solid rgba(255, 64, 80, 0.18);
+        border-radius: 50%;
+        pointer-events: none;
+      }
+
+      .specimen::after {
+        inset: 33%;
+        border-color: var(--faint);
+      }
+
+      #signal {
+        width: 100%;
+        height: 100%;
+      }
+
+      .specimen-link {
+        position: absolute;
+        right: 1rem;
+        bottom: 1rem;
+        z-index: 3;
+        padding: 0.65rem 0.8rem;
+        border: 1px solid var(--receiver-dim);
+        background: rgba(2, 6, 4, 0.88);
+        color: var(--bone);
+        font-size: 8px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+
+      .specimen-link:focus-visible {
+        outline: 1px solid var(--receiver);
+        outline-offset: 0.3rem;
+      }
+
+      .side-note {
+        padding-top: 0.8rem;
+        border-top: 1px solid var(--receiver-dim);
+        color: var(--dim);
+        font-size: 8px;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+      }
+
+      .side-note--right {
+        text-align: right;
+      }
+
+      .inode-message {
+        position: absolute;
+        left: 50%;
+        bottom: 2rem;
+        width: min(90%, 46rem);
+        margin: 0;
+        color: var(--dim);
+        font-family: var(--serif);
+        font-size: clamp(1rem, 2vw, 1.35rem);
+        text-align: center;
+        transform: translateX(-50%);
+      }
+
+      @media (max-width: 900px) {
+        .frame {
+          width: min(100% - 1.5rem, 1100px);
+        }
+        .inode-room {
+          grid-template-columns: 1fr;
+          place-content: center;
+        }
+        .side-note {
+          display: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="scanlines"></div>
+    <div class="frame">
+      <header class="machine-header">
+        <span class="machine-mark">FSCK RECOVERY</span>
+        <span>inode 00000000 / owner null</span>
+        <span>mount: read only</span>
+      </header>
+
+      <main class="room inode-room">
+        <p class="side-note">detached object<br />size: indeterminate<br />modified: tomorrow</p>
+
+        <div class="specimen">
+          <canvas id="signal" aria-label="A reconstructed signal object"></canvas>
+          <a class="specimen-link" id="specimenAction" href="./examination/">
+            examine recovered object
+          </a>
+        </div>
+
+        <p class="side-note side-note--right">
+          no recognized format<br />no originating device<br /><span id="owner">no observer</span
+          ><br /><span id="inputVector">input vector: idle</span>
+        </p>
+
+        <p class="inode-message" id="inodeMessage">
+          This file belongs to someone who has not arrived.
+        </p>
+      </main>
+
+      <footer class="machine-footer">
+        <span>recovery process 0</span>
+        <span>trace <span data-trace-id>--------</span></span>
+      </footer>
+    </div>
+
+    <script src="/assets/orison.js?v=6cd727dafb4f"></script>
+    <script>
+      ORISON.drawSignal(document.querySelector("#signal"));
+      const specimen = document.querySelector(".specimen");
+      const inputVector = document.querySelector("#inputVector");
+      specimen.addEventListener(
+        "pointermove",
+        (event) => {
+          const rect = specimen.getBoundingClientRect();
+          const x = Math.round(((event.clientX - rect.left) / rect.width) * 255);
+          const y = Math.round(((event.clientY - rect.top) / rect.height) * 255);
+          inputVector.textContent =
+            `input vector: ${x.toString(16).padStart(2, "0")}:` +
+            `${y.toString(16).padStart(2, "0")} acquired`;
+        },
+        { passive: true },
+      );
+      specimen.addEventListener("pointerleave", () => {
+        inputVector.textContent = "input vector: retained";
+      });
+      ORISON.page({
+        name: "inode",
+        render(state) {
+          const message = document.querySelector("#inodeMessage");
+          const action = document.querySelector("#specimenAction");
+          if (state.witness) {
+            message.textContent = "A previous observer marked this file for the arriving trace.";
+            document.querySelector("#owner").textContent = `witness: ${state.witness}`;
+          }
+          if (state.seen.inode > 1 && ORISON.awareness(state) >= 2) {
+            message.textContent = "The file has been reassigned.";
+            document.querySelector("#owner").textContent = `owner: ${state.id}`;
+          }
+          if (ORISON.awareness(state) >= 4) {
+            message.textContent = "The observer returned without instruction.";
+          }
+          if (state.seen.archive || ORISON.hasFlag(state, "response-attached")) {
+            action.href = "./archive/";
+            action.textContent = "return to recovered directory";
+            message.textContent = ORISON.hasFlag(state, "response-attached")
+              ? "The response source is attached. The recovered directory remains mounted."
+              : "The recovered directory remains mounted from the retained examination.";
+          }
+        },
+      });
+    </script>
+  </body>
+</html>

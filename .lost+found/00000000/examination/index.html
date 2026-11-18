@@ -1,0 +1,432 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>compatibility examination</title>
+    <link rel="stylesheet" href="/assets/base.css?v=8d65c5a18cc9" />
+    <style>
+      .exam {
+        display: grid;
+        grid-template-columns: minmax(180px, 0.45fr) minmax(300px, 1fr);
+        min-height: calc(100vh - 7.5rem);
+      }
+
+      .exam-side {
+        padding: 4rem 2rem 2rem 0;
+        border-right: 1px solid var(--faint);
+        color: var(--dim);
+      }
+
+      .exam-side dl {
+        margin-top: 4rem;
+      }
+
+      .exam-side div {
+        margin-bottom: 1.5rem;
+      }
+
+      .exam-side dt {
+        font-size: 8px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+
+      .exam-side dd {
+        margin: 0.25rem 0 0;
+        color: var(--bone);
+        font-family: var(--serif);
+        font-size: 1.4rem;
+      }
+
+      .exam-main {
+        display: grid;
+        align-content: center;
+        max-width: 720px;
+        padding: 4rem clamp(2rem, 7vw, 7rem);
+      }
+
+      .exam-main h1 {
+        margin: 0 0 3rem;
+        font: 400 clamp(2.8rem, 5vw, 4.5rem) / 0.9 var(--serif);
+        letter-spacing: -0.05em;
+      }
+
+      .question {
+        min-height: 14rem;
+      }
+
+      .question p {
+        max-width: 31rem;
+        color: var(--dim);
+        font: 1.1rem/1.7 var(--serif);
+      }
+
+      .answers {
+        display: grid;
+        gap: 0.65rem;
+        margin-top: 2rem;
+      }
+
+      .answers button {
+        padding: 0.9rem 0;
+        border: 0;
+        border-top: 1px solid var(--faint);
+        background: none;
+        color: var(--dim);
+        cursor: pointer;
+        text-align: left;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+      }
+
+      .answers button:hover {
+        color: var(--bone);
+      }
+
+      .answers button:focus-visible {
+        color: var(--bone);
+        outline: 1px solid var(--receiver);
+        outline-offset: 0.35rem;
+      }
+
+      .mount-terminal {
+        max-width: 35rem;
+        margin-top: 2rem;
+        padding: 1rem 1.1rem;
+        border: 1px solid rgba(85, 217, 120, 0.22);
+        background: #020604;
+        color: #72ff72;
+        box-shadow: inset 0 0 28px rgba(85, 217, 120, 0.035);
+        text-shadow: 0 0 7px rgba(114, 255, 114, 0.28);
+      }
+
+      .mount-output {
+        min-height: 4.8rem;
+        margin-bottom: 0.8rem;
+        color: rgba(114, 255, 114, 0.58);
+        font-size: 10px;
+        white-space: pre-wrap;
+      }
+
+      .mount-command {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: 0.65rem;
+        align-items: center;
+      }
+
+      .mount-command__slot {
+        position: relative;
+        min-width: 0;
+      }
+
+      .mount-command__slot::before {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 0;
+        width: 0.66em;
+        height: 1.1em;
+        background: #72ff72;
+        box-shadow: 0 0 7px rgba(114, 255, 114, 0.65);
+        opacity: 0;
+        transform: translateY(-50%);
+      }
+
+      .mount-command[data-empty="true"]:focus-within .mount-command__slot::before {
+        opacity: 0.78;
+        animation: mount-cursor 1.08s steps(1, end) infinite;
+      }
+
+      .mount-input {
+        position: relative;
+        z-index: 1;
+        width: 100%;
+        border: 0;
+        outline: 0;
+        background: transparent;
+        color: #72ff72;
+        caret-color: #72ff72;
+        font: inherit;
+        text-shadow: inherit;
+      }
+
+      .mount-input:focus-visible {
+        outline: 0;
+      }
+
+      .mount-hint {
+        margin-top: 1rem;
+        border: 1px solid rgba(85, 217, 120, 0.35);
+        padding: 0.65rem 0.8rem;
+        background: transparent;
+        color: #72ff72;
+        cursor: pointer;
+        font: inherit;
+        font-size: 9px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+
+      .mount-hint:focus-visible {
+        outline: 1px solid var(--receiver);
+        outline-offset: 0.3rem;
+      }
+
+      @keyframes mount-cursor {
+        0%,
+        46% {
+          opacity: 0.78;
+        }
+        47%,
+        100% {
+          opacity: 0;
+        }
+      }
+
+      @media (max-width: 680px) {
+        .exam {
+          display: block;
+        }
+        .exam-side {
+          display: none;
+        }
+        .exam-main {
+          min-height: calc(100svh - 5rem);
+          padding-inline: 0.5rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="scanlines"></div>
+    <div class="frame">
+      <header class="machine-header">
+        <span class="machine-mark">ORISON COMPATIBILITY UTILITY</span>
+        <span>unlicensed recovery component</span>
+        <span>input required</span>
+      </header>
+
+      <main class="exam">
+        <aside class="exam-side">
+          <p class="micro">receiver state</p>
+          <dl>
+            <div><dt>trace</dt><dd data-trace-id>--------</dd></div>
+            <div><dt>entries</dt><dd data-visit-count>000</dd></div>
+            <div><dt>classification</dt><dd id="classification">pending</dd></div>
+          </dl>
+        </aside>
+
+        <section class="exam-main">
+          <p class="micro">recovery prerequisite / not an identification process</p>
+          <h1>Compatibility examination</h1>
+          <div class="question" id="question"></div>
+        </section>
+      </main>
+
+      <footer class="machine-footer">
+        <span>response channel / local</span>
+        <span>step <span id="step">1</span> / 5</span>
+      </footer>
+    </div>
+
+    <script src="/assets/orison.js?v=6cd727dafb4f"></script>
+    <script>
+      const questions = [
+        {
+          text: "When a sealed system is encountered, what is assumed to be protected?",
+          answers: [
+            ["Something valuable", "valuable"],
+            ["Something dangerous", "dangerous"],
+            ["The system itself", "system"],
+          ],
+        },
+        {
+          text: "If a record contradicts retained memory, which receives examination first?",
+          answers: [
+            ["The record", "record"],
+            ["My memory", "memory"],
+            ["The contradiction", "contradiction"],
+          ],
+        },
+        {
+          text: "An instruction requires return to an already examined page.",
+          answers: [
+            ["I return", "compliant"],
+            ["I continue forward", "forward"],
+            ["I open both", "parallel"],
+          ],
+        },
+        {
+          text: "A process continues after its operator disconnects. What remains attached?",
+          answers: [
+            ["The process", "process"],
+            ["The operator", "operator"],
+            ["The interruption", "interruption"],
+          ],
+        },
+        {
+          text: "A record changes to include the act of reading it. Which version is original?",
+          answers: [
+            ["The earlier record", "earlier"],
+            ["The changed record", "changed"],
+            ["The act of comparison", "comparison"],
+          ],
+        },
+      ];
+
+      let step = 0;
+
+      function showQuestion() {
+        const area = document.querySelector("#question");
+        const item = questions[step];
+        document.querySelector("#step").textContent = Math.min(
+          step + 1,
+          questions.length,
+        );
+        area.innerHTML = "";
+
+        if (!item) {
+          const state = ORISON.read();
+          const responseVector = questions
+            .map((question) => {
+              const index = question.answers.findIndex(([, value]) =>
+                state.answers.includes(value),
+              );
+              return index < 0 ? "-" : String(index + 1);
+            })
+            .join(".");
+          document.querySelector("#classification").textContent = "suitable";
+          ORISON.flag("examined");
+          if (state.seen.archive) {
+            area.innerHTML = `
+              <p class="micro">mount retained / directory already attached</p>
+              <p>The compatibility response remains retained. The recovered directory is still mounted.</p>
+              <a class="mount-hint return-link" id="mountHint" href="../archive/">
+                return to recovered directory
+              </a>
+            `;
+            return;
+          }
+          area.innerHTML = `
+            <p class="micro fault">compatibility result withheld</p>
+            <p>The response channel has become a command channel.</p>
+            <div class="mount-terminal">
+              <div class="mount-output" id="mountOutput"></div>
+              <form class="mount-command" id="mountCommand" autocomplete="off">
+                <label for="mountInput">receiver@orison:/ $</label>
+                <span class="mount-command__slot">
+                  <input
+                    class="mount-input"
+                    id="mountInput"
+                    type="text"
+                    inputmode="text"
+                    autocapitalize="none"
+                    spellcheck="false"
+                    aria-label="Mount command"
+                  />
+                </span>
+              </form>
+            </div>
+            <button class="mount-hint" id="mountHint" type="button">mount directory</button>
+          `;
+          document.querySelector("#mountOutput").textContent =
+            `examination: response vector ${responseVector} retained\n` +
+            "classification: interpretive fit / sufficient\n" +
+            "mount: awaiting operator command";
+          const input = document.querySelector("#mountInput");
+          ORISON.terminalInput(input);
+          const acceptMount = () => {
+            const output = document.querySelector("#mountOutput");
+            input.disabled = true;
+            document.querySelector("#mountHint").disabled = true;
+            output.textContent =
+              "mount: receiver accepted\nmount: recovered directory attached read-only";
+            window.setTimeout(
+              () => window.location.assign("../archive/"),
+              window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 850,
+            );
+          };
+          document.querySelector("#mountCommand").addEventListener("submit", (event) => {
+            event.preventDefault();
+            const command = input.value.trim().toLowerCase();
+            const output = document.querySelector("#mountOutput");
+            input.value = "";
+            input.dispatchEvent(new Event("input"));
+
+            if (
+              command === "mount directory" ||
+              command === "mount recovered directory" ||
+              command === "mount /recovered" ||
+              command === "mount"
+            ) {
+              ORISON.observeCommand("mount");
+              acceptMount();
+              return;
+            }
+
+            if (command === "help") {
+              ORISON.observeCommand("utility");
+              output.textContent = "available operation: mount directory";
+            } else if (command === "ls") {
+              ORISON.observeCommand("inspect");
+              output.textContent = "directory\noperator: unresolved";
+            } else if (command === "whoami") {
+              ORISON.observeCommand("process");
+              output.textContent = `input-source:${ORISON.read().id}`;
+            } else if (command) {
+              ORISON.observeCommand(command.startsWith("mount") ? "mount" : "", true);
+              output.textContent = `${command}: operation refused\nmount: still waiting`;
+            }
+          });
+          document.querySelector("#mountHint").addEventListener("click", () => {
+            ORISON.observeCommand("mount");
+            acceptMount();
+          });
+          input.focus();
+          return;
+        }
+
+        const prompt = document.createElement("p");
+        prompt.textContent = item.text;
+        document.querySelector("#classification").textContent =
+          `sampling ${step + 1}/${questions.length}`;
+        const answers = document.createElement("div");
+        answers.className = "answers";
+
+        item.answers.forEach(([label, value]) => {
+          const button = document.createElement("button");
+          button.type = "button";
+          button.textContent = label;
+          button.addEventListener("click", () => {
+            ORISON.answer(value);
+            step += 1;
+            showQuestion();
+          });
+          answers.append(button);
+        });
+
+        area.append(prompt, answers);
+      }
+
+      window.addEventListener("pagehide", () => {
+        const mountInput = document.querySelector("#mountInput");
+        if (mountInput) mountInput.disabled = false;
+      });
+
+      ORISON.page({
+        name: "exam",
+        render(state) {
+          const unanswered = questions.findIndex(
+            (question) =>
+              !question.answers.some(([, value]) => state.answers.includes(value)),
+          );
+          step = unanswered < 0 ? questions.length : unanswered;
+          showQuestion();
+        },
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>staff register / station 0</title>
+    <link rel="stylesheet" href="/assets/base.css?v=8d65c5a18cc9" />
+    <style>
+      body {
+        background: var(--black);
+        color: #222527;
+      }
+
+      body::after {
+        opacity: 0.16;
+        mix-blend-mode: multiply;
+      }
+
+      .scanlines {
+        display: none;
+      }
+
+      .register {
+        --paper-signal: #14582e;
+        width: min(1050px, calc(100% - 2rem));
+        min-height: 100vh;
+        margin: 0 auto;
+        padding: clamp(1.5rem, 5vw, 5rem);
+        background: #c7c2b5;
+        box-shadow: 0 0 80px rgba(0, 0, 0, 0.35);
+      }
+
+      .register-head {
+        display: flex;
+        align-items: end;
+        justify-content: space-between;
+        gap: 2rem;
+        padding-bottom: 1rem;
+        border-bottom: 4px double #222527;
+      }
+
+      .register h1 {
+        margin: 0;
+        font: 700 clamp(2.7rem, 5vw, 4.5rem) / 0.86 "Arial Narrow", Arial, sans-serif;
+        letter-spacing: -0.06em;
+        text-transform: uppercase;
+      }
+
+      .register table {
+        width: 100%;
+        margin: 4rem 0;
+        border-collapse: collapse;
+        font-size: 10px;
+        text-align: left;
+      }
+
+      .register th,
+      .register td {
+        padding: 0.9rem 0.4rem;
+        border-bottom: 1px solid rgba(34, 37, 39, 0.3);
+      }
+
+      .register th {
+        font-size: 8px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+      }
+
+      .portrait {
+        display: inline-grid;
+        place-items: center;
+        width: 36px;
+        height: 45px;
+        background:
+          radial-gradient(ellipse at 50% 35%, #4b4e4f 0 21%, transparent 22%),
+          linear-gradient(76deg, transparent 35%, #55595a 36% 63%, transparent 64%),
+          #a9a69c;
+        filter: grayscale(1) contrast(1.5);
+      }
+
+      .subject-row {
+        color: var(--paper-signal);
+      }
+
+      .register a {
+        color: inherit;
+      }
+
+      .register .handoff-record {
+        --handoff-accent: var(--paper-signal);
+        --handoff-border: rgba(20, 88, 46, 0.48);
+        background: rgba(20, 88, 46, 0.035);
+      }
+
+      @media (min-width: 641px) and (max-height: 760px) {
+        .register {
+          padding: 1.25rem 2rem;
+        }
+        .register h1 {
+          font-size: 3.2rem;
+        }
+        .register table {
+          margin: 1rem 0;
+        }
+        .register th,
+        .register td {
+          padding-block: 0.35rem;
+        }
+        .portrait {
+          width: 24px;
+          height: 30px;
+        }
+        .register .handoff-record {
+          margin-top: 0.75rem;
+        }
+      }
+
+      @media (max-width: 640px) {
+        .register-head span {
+          display: none;
+        }
+        .register table {
+          font-size: 8px;
+        }
+        .register th:nth-child(4),
+        .register td:nth-child(4) {
+          display: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="register">
+      <header class="register-head">
+        <h1>Station personnel</h1>
+        <span>ORISON ARRAY / ARCHIVE COPY / UNCONTROLLED</span>
+      </header>
+
+      <table>
+        <thead>
+          <tr>
+            <th>image</th>
+            <th>record</th>
+            <th>assignment</th>
+            <th>last access</th>
+            <th>status</th>
+          </tr>
+        </thead>
+        <tbody id="staffRows">
+          <tr><td><span class="portrait"></span></td><td>0031 / A. VALE</td><td>pattern review</td><td>1999-08-17</td><td>absent</td></tr>
+          <tr><td><span class="portrait"></span></td><td>0044 / M. SEL</td><td>carrier analysis</td><td>1999-08-17</td><td>absent</td></tr>
+          <tr><td><span class="portrait"></span></td><td>0062 / N. GREY</td><td>forecast validation</td><td>1999-08-18</td><td>absent</td></tr>
+          <tr><td><span class="portrait"></span></td><td>0000 / [REDACTED]</td><td>operator</td><td>pending</td><td>connected</td></tr>
+        </tbody>
+      </table>
+
+      <p id="staffNote">
+        This register was printed after the station network was disconnected.
+      </p>
+      <section class="handoff-record" id="staffHandoff">
+        <div class="handoff-record__result">
+          <span id="staffHandoffState">personnel 71 / source pending</span>
+          <strong id="staffHandoffResult">
+            No connected source crossed the insertion threshold.
+          </strong>
+        </div>
+        <a class="handoff-record__action" href="../">
+          <span>return personnel register to recovered directory</span>
+          <span aria-hidden="true">→</span>
+        </a>
+      </section>
+    </main>
+
+    <script src="/assets/orison.js?v=6cd727dafb4f"></script>
+    <script>
+      function weatherResolved(state) {
+        return (
+          ORISON.hasFlag(state, "mirror-route") &&
+          (ORISON.hasFlag(state, "forecast-returned") ||
+            ORISON.hasFlag(state, "forecast-held"))
+        );
+      }
+
+      function integrityResolved(state) {
+        return (
+          ORISON.hasFlag(state, "checksum-match") ||
+          ORISON.hasFlag(state, "checksum-drift")
+        );
+      }
+
+      function staffSourceVisible(state) {
+        const staffPosition = state.order.indexOf("staff");
+        const integrityPosition = state.order.indexOf("integrity");
+        return (
+          weatherResolved(state) &&
+          integrityResolved(state) &&
+          ORISON.awareness(state) >= 2 &&
+          Boolean(state.seen.staff) &&
+          staffPosition !== -1 &&
+          integrityPosition !== -1 &&
+          (staffPosition > integrityPosition || state.seen.staff > 1)
+        );
+      }
+
+      ORISON.page({
+        name: "staff",
+        render(state) {
+          if (staffSourceVisible(state)) {
+            const row = document.createElement("tr");
+            row.className = "subject-row";
+            row.innerHTML = `
+              <td><span class="portrait"></span></td>
+              <td>${state.id} / UNNAMED</td>
+              <td>behavioral source</td>
+              <td>${new Date().toLocaleString()}</td>
+              <td>present</td>
+            `;
+            document.querySelector("#staffRows").append(row);
+            document.querySelector("#staffNote").textContent =
+              "Personnel count increased when this document was opened.";
+            document.querySelector("#staffHandoffState").textContent =
+              "personnel 71 / source indexed";
+            document.querySelector("#staffHandoffResult").textContent =
+              `Trace ${state.id} entered the personnel index as a present source.`;
+          }
+        },
+      });
+    </script>
+  </body>
+</html>

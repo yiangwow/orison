@@ -1,0 +1,5 @@
+User-agent: *
+Disallow: /.lost+found/
+Disallow: /.lost+found/00000000/operator/
+
+# crawler note: inode 00000000 has no owner

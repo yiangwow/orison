@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>held object</title>
+    <link rel="stylesheet" href="/assets/base.css?v=8d65c5a18cc9" />
+    <style>
+      .held { position: relative; z-index: 1; max-width: 44rem; margin: 0 auto; padding: 3rem 1.5rem 5rem; }
+      .held h1 { margin: 0 0 0.5rem; font: 400 clamp(2.4rem, 7vw, 4.5rem) / 0.9 var(--serif); }
+      .held .meta { margin: 0 0 2rem; color: var(--dim); white-space: pre-wrap; }
+      .held p { max-width: 38rem; }
+      .held .frag { margin: 1.5rem 0; padding: 0.9rem 1rem; border: 1px solid var(--dim); white-space: pre-wrap; word-break: break-word; }
+      .held .frag span { display: block; margin-bottom: 0.4rem; color: var(--dim); }
+      .held form { margin-top: 1.5rem; display: flex; gap: 0.6rem; flex-wrap: wrap; }
+      .held input { flex: 1 1 14rem; padding: 0.7rem 0.8rem; border: 1px solid var(--recovery-green); box-shadow: 0 0 0.6rem var(--receiver-dim); background: rgba(114, 255, 114, 0.04); color: var(--recovery-green); font: inherit; }
+      .held input::placeholder { color: var(--ambient); opacity: 0.85; }
+      .held input:focus { outline: none; box-shadow: 0 0 0.9rem var(--recovery-green); }
+      .held button { padding: 0.7rem 1rem; border: 1px solid var(--recovery-green); background: none; color: var(--recovery-green); cursor: pointer; font: inherit; }
+      .held .verdict { min-height: 1.4em; margin-top: 1rem; color: var(--dim); }
+      .held .hint { margin: 0.4rem 0 0; color: var(--ambient); }
+      .held .hint[hidden] { display: none; }
+      .held .seal { margin-top: 2.5rem; padding-top: 1.5rem; border-top: 1px solid var(--dim); }
+      .held .seal[hidden] { display: none; }
+      .held .accepted { color: var(--recovery-green); }
+      .held audio { display: block; width: 100%; margin: 1rem 0; }
+      .held a { color: var(--recovery-green); text-underline-offset: 0.28em; }
+      .held .return { display: inline-block; margin-top: 3rem; color: var(--dim); }
+    </style>
+  </head>
+  <body>
+    <main class="held">
+      <h1>Held object</h1>
+      <p class="meta">addressee   MIHAI
+class       audio, one object, sealed
+origin      unlisted
+condition   not recovered. left.
+seals       two. the second opens when the first is named.</p>
+      <p>
+        The sender did not use this archive. The archive used the sender. What
+        was left here is a recording that speaks to you by name, and the archive
+        does not hand things over. It hands them back.
+      </p>
+      <p>This delivery is sealed twice, both seals made from things already on record, in your own hand.</p>
+
+      <section id="stage1">
+        <div class="frag"><span>seal 01 &middot; inventory, name withheld</span>The first object is not filed under its name. It is red, and the sky belongs to it. It throws fire from above and carries poison in its talons; its mate is green, keeps to the ground, and puts her poison in the tail. It has been the face on the box since the beginning, and it has killed you more times than anything else you have hunted. Name it.</div>
+        <form id="claim1" autocomplete="off">
+          <input id="key1" name="key1" type="text" aria-label="first seal" placeholder="name it" spellcheck="false" />
+          <button type="submit">claim</button>
+        </form>
+        <p class="verdict" id="verdict1" aria-live="polite"></p>
+        <p class="hint" id="hint1a" hidden>Eight letters, one word. The first four belong to his mate as well.</p>
+        <p class="hint" id="hint1b" hidden>It ends in los.</p>
+      </section>
+
+      <section class="seal" id="stage2" hidden>
+        <p class="accepted">Accepted. The sound you never called a flaw had a name. The log did not carry it. You did.</p>
+        <p>One seal remains. The second object was not yours, and you wanted it anyway. That is on record too.</p>
+        <div class="frag"><span>seal 02 &middot; inventory, badge withheld</span>The second object is Italian and named after a breed of fighting bull. Ten cylinders behind the seats, and for ten years it was the one that house sold more of than anything it had ever built. The Italian police were given two of them, painted blue, and used one to carry organs for transplant. It was replaced by a hurricane. Name it.</div>
+        <form id="claim2" autocomplete="off">
+          <input id="key2" name="key2" type="text" aria-label="second seal" placeholder="name it" spellcheck="false" />
+          <button type="submit">claim</button>
+        </form>
+        <p class="verdict" id="verdict2" aria-live="polite"></p>
+        <p class="hint" id="hint2a" hidden>Ten cylinders, and the house is in Sant'Agata.</p>
+        <p class="hint" id="hint2b" hidden>It begins with G.</p>
+      </section>
+
+      <section class="seal" id="release" hidden>
+        <p class="accepted">Accepted. The object is handed back to you. It was not kept for you. It was held until you came for it.</p>
+        <audio id="player" controls preload="none"></audio>
+        <p><a id="download" href="#" download="mihai.mp3">download the object</a></p>
+      </section>
+
+      <a class="return" href="/">return to the archive</a>
+    </main>
+    <script src="/assets/orison.js?v=6cd727dafb4f"></script>
+    <script>
+      ORISON.page({ name: "held-second" });
+      (() => {
+        // Answers are compared by digest and the payload's name is assembled
+        // from fragments the digests unlock; the answers are not in this page.
+        const S1_PASS = {"c182b9ab1ebc794d807228f38d0fd744a920cf25e0ce42fa7ec3cfbff8edf845": "c182b9ab", "a902cb3585debc473f97f80df2a05120a8155f0e93a7c715d3e279c418bd8e88": "c182b9ab", "11c486f5ba4cc1c704372b2717d3d4e1ec2ca9751b042806c8e449c571894efa": "c182b9ab", "b2cc990347016864b4318de3942bf939866548f9d78f7eba45583c16fd86ebd6": "c182b9ab"};
+        const S1_NEAR = {"8937a60df5f90d4402aed0d7fda5dda0241690e00b0c5451da8a89f76afd8075": "That is his mate. She keeps to the ground.", "dc028a1f2dce501e2f3fe889480523a9fcc3b1a7853b168c93d54683768f4083": "Half a name. Both of them answer to it.", "6bb4a8526c7d7b81fa72ed2be22bdc8f95597a511bfab5f8629c0684eabc4ccc": "Horns, and sand. Not this one.", "0eedbe39d20f666a54f9fd82e2a7b8c7673ade3d1f86f530d68b56d3e6500740": "Another legend, and black. This one is red.", "174fa719d36a5e1caba703e414e74d7170516e5cf47369539a40ade150384ea5": "A later game. This one was on the first box.", "a4d7bf133f74bbacdca179bc07049af052a9a8c42f9d32a32267c3ae2b90537f": "A later game. This one was on the first box.", "666a98a2863777e841a7b4ae53a2ae05b8a6c6affa321efcf57b0d06578b4829": "A later game. This one was on the first box.", "5aca966e902a64ada70d42ae463d0e11b88ec1ebe67881007e915ba47ac9a0a2": "Steel and wind. Not this one.", "a9c43be948c5cabd56ef2bacffb77cdaa5eec49dd5eb0cc4129cf3eda5f0e74c": "The archive knows what it is. It asked for the name."};
+        const S2_PASS = {"ccbb4d1ed8dc85adababc70c3ac6807e8effca8a53c771e3a0d3e94b4b308e79": "ccbb4d1e", "d4f16d8ca7d5a03fcacfa66c2a22cd743d92272c834f073242ae4f17bb6a715d": "ccbb4d1e", "6bb486dd03966f5b0547b8655f841d26bfb6ef70b3ab2cf3ee6d2afe20908900": "ccbb4d1e", "9b9b5cbed9d770bb11a437ca624a3c77a27bf32ecc4bb3f07dc41dc2cd55cffa": "ccbb4d1e", "34a653afa09d58809ccd5ef691505a0f6fd341232bdb507bbd698244889812fb": "ccbb4d1e"};
+        const S2_NEAR = {"c798ceefaebca0239eb599d2b50f2384e899ca5822588d54b3283da32dcc325e": "That is the house. The archive asked for the model.", "bc7cf653fae92897cc99f396ae3aac58c03a4f7ced3d3bfe810b28e010b6623c": "That is the house. The archive asked for the model.", "6eded4e498617dffd8abf51faf356a3aee312fdb4054adc7e85cd475f56afd52": "The one that came after. The archive asked for the one before it.", "73fc8d2a61a4c97d3de45f973b8a105defa671afdfec5dabd83af7cbab26ba48": "Twelve cylinders. That is the older brother.", "31e4dacf7448f4bf01863352922ca10bf1f0f0851dcecd1e91c35405e91731ee": "Twelve cylinders. That is the younger brother.", "8c649a8f85f3d89d4eba2cf885e7f9273c9672b73eaf3ce43c5ea038ca648f0f": "Twelve cylinders, and a decade early.", "b8510932dad3ddf0fc34661a0caf6674e5c0d672e3930c6a736424d4df0e8016": "Another house entirely.", "b51026e4444f98ecdbe1d7cb1f310427a47d7a6e7659b37ce3d00010b09af252": "They shared an engine. They did not share a badge.", "99c66b8eedd61fc4247795c4588041dbc0b073ea0f332f7d16528f706aa528a0": "They shared an engine. They did not share a badge."};
+        const NOTES_EN = ["The archive notes the attempt.", "The archive notes the attempt. It is patient.", "The archive has stopped counting. You have not."];
+        const NOTES_RO = ["The archive notes the attempt.", "The archive notes the attempt. It is patient.", "The archive has stopped counting. You have not."];
+        const frags = {};
+        async function digest(text) {
+          const data = new TextEncoder().encode(text);
+          const hash = await crypto.subtle.digest("SHA-256", data);
+          return Array.from(new Uint8Array(hash), (b) => b.toString(16).padStart(2, "0")).join("");
+        }
+        function base(text) {
+          return text.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().trim()
+            .replace(/[.!?]+$/, "").replace(/-/g, " ").replace(/\s+/g, " ").trim();
+        }
+        function stage1Forms(text) {
+          let t = base(text);
+          t = t.replace(/^(the|a|an) /, "").replace(/^(us rifle|rifle) /, "").replace(/ rifle$/, "");
+          return [t.replace(/\s+/g, "")];
+        }
+        function stage2Forms(text) {
+          const t = base(text);
+          return [...new Set([...t.split(" "), t.replace(/\s+/g, "")])].filter(Boolean);
+        }
+        function ladder(state, verdict, notes, hintA, hintB, nearText) {
+          if (nearText) {
+            state.near += 1;
+            verdict.textContent = nearText;
+            if (state.near >= 2) hintA.hidden = false;
+            if (state.near >= 4) hintB.hidden = false;
+            return;
+          }
+          state.wrong += 1;
+          verdict.textContent = notes[Math.min(state.wrong, notes.length) - 1];
+          if (state.wrong >= 2) hintA.hidden = false;
+          if (state.wrong >= 4) hintB.hidden = false;
+        }
+        async function check(forms, pass, near) {
+          const digests = await Promise.all(forms.map(digest));
+          for (const d of digests) if (pass[d]) return { frag: pass[d] };
+          for (const d of digests) if (near[d]) return { near: near[d] };
+          return {};
+        }
+        const st1 = { wrong: 0, near: 0 }, st2 = { wrong: 0, near: 0 };
+        document.querySelector("#claim1").addEventListener("submit", async (event) => {
+          event.preventDefault();
+          const raw = document.querySelector("#key1").value;
+          if (!raw.trim()) return;
+          const r = await check(stage1Forms(raw), S1_PASS, S1_NEAR);
+          if (!r.frag) { ladder(st1, document.querySelector("#verdict1"), NOTES_EN, document.querySelector("#hint1a"), document.querySelector("#hint1b"), r.near); return; }
+          frags.one = r.frag;
+          document.querySelector("#verdict1").textContent = "";
+          document.querySelector("#claim1").hidden = true;
+          const s2 = document.querySelector("#stage2"); s2.hidden = false; s2.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+        document.querySelector("#claim2").addEventListener("submit", async (event) => {
+          event.preventDefault();
+          const raw = document.querySelector("#key2").value;
+          if (!raw.trim() || !frags.one) return;
+          const r = await check(stage2Forms(raw), S2_PASS, S2_NEAR);
+          if (!r.frag) { ladder(st2, document.querySelector("#verdict2"), NOTES_RO, document.querySelector("#hint2a"), document.querySelector("#hint2b"), r.near); return; }
+          const href = `/mihai/${frags.one}${r.frag}.mp3`;
+          document.querySelector("#player").src = href;
+          document.querySelector("#download").href = href;
+          document.querySelector("#verdict2").textContent = "";
+          document.querySelector("#claim2").hidden = true;
+          const rel = document.querySelector("#release"); rel.hidden = false; rel.scrollIntoView({ behavior: "smooth", block: "nearest" });
+        });
+      })();
+    </script>
+  </body>
+</html>

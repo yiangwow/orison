@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>404 / path recorded</title>
+    <link rel="stylesheet" href="/assets/base.css?v=8d65c5a18cc9" />
+    <style>
+      .missing {
+        position: relative;
+        z-index: 1;
+        display: grid;
+        place-content: center;
+        min-height: 100vh;
+        padding: 2rem;
+        text-align: center;
+      }
+      .missing h1 {
+        font: 400 clamp(4rem, 20vw, 11rem) / 0.8 var(--serif);
+        margin: 0;
+      }
+      .missing p {
+        color: var(--dim);
+      }
+      body[data-region="fragment"] .missing h1 {
+        color: var(--receiver);
+        font-family: var(--mono);
+        letter-spacing: -0.08em;
+      }
+      body[data-region="fragment"] #recorded {
+        color: var(--receiver);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="scanlines"></div>
+    <main class="missing">
+      <h1 id="missingCode">404</h1>
+      <p id="missingCopy">The path does not exist.</p>
+      <p id="recorded" hidden>This attempt has been added to the examination.</p>
+      <a id="missingReturn" href="/">return</a>
+    </main>
+    <script src="/assets/orison.js?v=6cd727dafb4f"></script>
+    <script>
+      ORISON.page({
+        name: "missing",
+        render(state) {
+          state = ORISON.flag("probed");
+          const fragmentMatch = window.location.pathname.match(
+            /^\/\.lost\+found\/00000000\/fragments\/(013|027|058)\/?$/,
+          );
+          if (fragmentMatch && ORISON.hasFlag(state, "orphan-released")) {
+            const address = fragmentMatch[1];
+            if (!ORISON.hasFlag(state, `fragment-probe-${address}`)) {
+              state = ORISON.flag(`fragment-probe-${address}`);
+            }
+
+            document.body.dataset.region = "fragment";
+            document.title = `404 / child address ${address}`;
+            document.querySelector("#missingCode").textContent = address;
+            document.querySelector("#missingCopy").textContent =
+              "The requested child address is no longer absent.";
+            const recorded = document.querySelector("#recorded");
+            recorded.hidden = false;
+            recorded.textContent =
+              `trace/${state.id} accepted / absence reassigned`;
+            const returnLink = document.querySelector("#missingReturn");
+            returnLink.href = "/.lost+found/00000000/fragments/";
+            returnLink.textContent = "continue child sequence";
+            return;
+          }
+          if (state.visits > 5) document.querySelector("#recorded").hidden = false;
+        },
+      });
+    </script>
+  </body>
+</html>

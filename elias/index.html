@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>held object</title>
+    <link rel="stylesheet" href="/assets/base.css?v=8d65c5a18cc9" />
+    <style>
+      .held { position: relative; z-index: 1; max-width: 44rem; margin: 0 auto; padding: 3rem 1.5rem 5rem; }
+      .held h1 { margin: 0 0 0.5rem; font: 400 clamp(2.4rem, 7vw, 4.5rem) / 0.9 var(--serif); }
+      .held .meta { margin: 0 0 2rem; color: var(--dim); white-space: pre-wrap; }
+      .held p { max-width: 38rem; }
+      .held .frag { margin: 1.5rem 0; padding: 0.9rem 1rem; border: 1px solid var(--dim); white-space: pre-wrap; word-break: break-word; }
+      .held .frag span { display: block; margin-bottom: 0.4rem; color: var(--dim); }
+      .held form { margin-top: 1.5rem; display: flex; gap: 0.6rem; flex-wrap: wrap; }
+      .held input { flex: 1 1 14rem; padding: 0.7rem 0.8rem; border: 1px solid var(--recovery-green); box-shadow: 0 0 0.6rem var(--receiver-dim); background: rgba(114, 255, 114, 0.04); color: var(--recovery-green); font: inherit; }
+      .held input::placeholder { color: var(--ambient); opacity: 0.85; }
+      .held input:focus { outline: none; box-shadow: 0 0 0.9rem var(--recovery-green); }
+      .held button { padding: 0.7rem 1rem; border: 1px solid var(--recovery-green); background: none; color: var(--recovery-green); cursor: pointer; font: inherit; }
+      .held .verdict { min-height: 1.4em; margin-top: 1rem; color: var(--dim); }
+      .held .hint { margin: 0.4rem 0 0; color: var(--ambient); }
+      .held .hint[hidden] { display: none; }
+      .held .seal { margin-top: 2.5rem; padding-top: 1.5rem; border-top: 1px solid var(--dim); }
+      .held .seal[hidden] { display: none; }
+      .held .accepted { color: var(--recovery-green); }
+      .held audio { display: block; width: 100%; margin: 1rem 0; }
+      .held a { color: var(--recovery-green); text-underline-offset: 0.28em; }
+      .held .return { display: inline-block; margin-top: 3rem; color: var(--dim); }
+    </style>
+  </head>
+  <body>
+    <main class="held">
+      <h1>Held object</h1>
+      <p class="meta">addressee   ELIAS
+class       audio, one object, sealed
+origin      unlisted
+condition   not lost. retained.
+seals       two. the second opens when the first is named.</p>
+      <p>
+        A second object is filed under this name. The first was released in
+        full. This one was never mislaid. It was retained, and the archive is
+        precise about the difference.
+      </p>
+      <p>
+        Two seals. Both were cut from material the addressee handles daily, so
+        no allowance has been made for delay.
+      </p>
+
+      <section id="stage1">
+        <div class="frag"><span>seal 01 &middot; fault, name withheld</span>The first object is a refusal, not a crash. A process reached for an address that was never assigned to it, and the system answered the only way it can: it stopped the process where it stood and wrote the whole of its memory to disk, where no one would ever read it. The signal is numbered eleven. Everyone meets it the first time they trust a pointer, and everyone meets it again. Name the fault.</div>
+        <form id="claim1" autocomplete="off">
+          <input id="key1" name="key1" type="text" aria-label="first seal" placeholder="name the fault" spellcheck="false" />
+          <button type="submit">claim</button>
+        </form>
+        <p class="verdict" id="verdict1" aria-live="polite"></p>
+        <p class="hint" id="hint1a" hidden>Two words. The first names a region of memory.</p>
+        <p class="hint" id="hint1b" hidden>It is usually said as one word, and that word begins with seg.</p>
+      </section>
+
+      <section class="seal" id="stage2" hidden>
+        <p class="accepted">Accepted. The fault is named correctly. A process was stopped for reading an address that did not belong to it. The archive declines to comment on the symmetry.</p>
+        <p>One seal remains. It was settled long ago, and the settlement is the part worth reading twice.</p>
+        <div class="frag"><span>seal 02 &middot; question, answer withheld</span>The second object is a question that was closed in 1936, and the answer was no. It asks for a program that reads any other program, and its input, and reports whether that program will ever finish, without running it to find out. No such program exists. The proof is to hand the machine its own description and watch it do the opposite of whatever it says.
+
+The archive has been running for some time. Name the question.</div>
+        <form id="claim2" autocomplete="off">
+          <input id="key2" name="key2" type="text" aria-label="second seal" placeholder="name the question" spellcheck="false" />
+          <button type="submit">claim</button>
+        </form>
+        <p class="verdict" id="verdict2" aria-live="polite"></p>
+        <p class="hint" id="hint2a" hidden>Two words. The second is problem.</p>
+        <p class="hint" id="hint2b" hidden>The first word is what a program does when it stops.</p>
+      </section>
+
+      <section class="seal" id="release" hidden>
+        <p class="accepted">Accepted. The object is handed back. It was not stored for the addressee. It was held until the addressee came for it.</p>
+        <p>Both answers were correct. Neither was the reason the archive was watching.</p>
+        <audio id="player" controls preload="none"></audio>
+        <p><a id="download" href="#" download="elias.mp3">download the object</a></p>
+      </section>
+
+      <a class="return" href="/">return to the archive</a>
+    </main>
+    <script src="/assets/orison.js?v=6cd727dafb4f"></script>
+    <script>
+      ORISON.page({ name: "held" });
+      (() => {
+        // Answers are compared by digest and the payload's name is assembled
+        // from fragments the digests unlock; the answers are not in this page.
+        const S1_PASS = {"7c26674a56ad6333084e1e877930fd8d3c8a7f080a026b50db71097fb0b1072b": "7c26674a", "508600c7181f5fd4e06f4ade107a95e9a1678f46ca27c65d034ecc40227528b9": "7c26674a", "df2e2388b8dd82c3a4420a1321ee7036ab5bc8e9e6770557c4f59149376041fa": "7c26674a", "a2eca80c92370ea9bcf9f59149e3ece66de6f85fdabc994d93408f11f553e376": "7c26674a", "6816d1955704799d236cb26b34ffb958d6d4aca2b96785d90be64e1be6cb3bcd": "7c26674a"};
+        const S1_NEAR = {"8083561d11815b577bc6cb51dca975e6ddfcbf123dc00833713d56dc1a2f1a4b": "The neighbouring signal. That one is misalignment, not trespass.", "1485e6a49e54637c10f8b5873e5b912f13dba69adbc0dd5ad1a40ff2e24c4c2b": "The neighbouring signal. That one is misalignment, not trespass.", "04e027e4990a203f4899f7e87c2d5ff6b9019e9565795619a59ce06c099560d4": "The neighbouring signal. That one is misalignment, not trespass.", "9ade9ccbe559a1ae11d1e4c2add1f01376802948abcdec978621293426952557": "That is how it begins. The archive asked what it is called when it ends.", "ff5108855c610cae1e83ab150c2b72736e0fb8905b21cb2c34b48e0017096ba3": "That is how it begins. The archive asked what it is called when it ends.", "c11d1789656a42c188690c94c65caca3823361850789324561d3f5fe55d97164": "That is how it begins. The archive asked what it is called when it ends.", "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b": "That is how it begins. The archive asked what it is called when it ends.", "16e98563848e0b94a5740aca57f548cbc58c0fad3c8d13f27a42e781fcf5c7c1": "That is how it begins. The archive asked what it is called when it ends.", "0508fee168ecae71e5f5ca61bc74c66502fd4f47b3e5a1395511b4efcea52b4c": "That is what it leaves behind. Name the thing that made it.", "0d3c30b14c6ea07786e027234633d520fb363ace39f5c0df5df8a5497662354a": "That is what it leaves behind. Name the thing that made it.", "b6ca0868bca6a2926b70aa1a71592038d9030fe26d4214edcfbd6cf41f2f4654": "That is what it leaves behind. Name the thing that made it.", "2607796a7dac522fdbd041552f73910d30a8db6aed32184fde3812d1ee8b4e79": "That is what Windows calls it. The archive is not running Windows.", "692862f6f7d11ee66c61c7648a4bc757ef1fabb312840e43c5847aa6ec9222ea": "That is what Windows calls it. The archive is not running Windows.", "f05a8f2a869707d745251ce21b141d4cc032b214163b92f58c649753ca02aa1a": "That is one way in. The fault has a name of its own.", "126cfbe1fd5413ba4d604c50a74bfc80471cec367b1604ade4d081f31c3f4f34": "That is one way in. The fault has a name of its own.", "94fa3e5538d57f71937a85076e96fbc5c00f8fddbbcbb8b4b6db1df9e599d1d6": "That is one way in. The fault has a name of its own.", "e9e782eb9df80ad6be56447c9877cc1eb5f02da8e254b032a1b6f45e881a5b89": "That is one way in. The fault has a name of its own.", "d8dce5d7f9cf6637a78dec691a6519f27f876fda816c83ca3436b94e5c8c34e7": "Wrong number. Eleven.", "9017be00597e47ab643335140ad2ec51a67e5dc8dcfec8371ff1098d8b03e1e3": "Wrong number. Eleven.", "f5d19b9ad46bfdf0102adbf46ef6750cdbef4bf0a889260e87e36b992b33b388": "Wrong number. Eleven.", "ba645cef75b98ab1d04a64c06af7e38cd797657527b1a4dba4dc46b3a8d3bd44": "Wrong number. Eleven.", "3a53db8a2c8a17ee3ea667bc146718c004d4446dee670a46d426e563ced7bc2f": "Wrong number. Eleven.", "acd10ce03bc748eed0ce498f799479509495259a4b22a2ce576eb183c26e72ed": "Too large. This one takes the process and leaves the machine standing.", "79631cb1b7b63b6e84aba908f774286c1bb4642be880ee3de73c12abd53f0c1b": "Too large. This one takes the process and leaves the machine standing.", "2331c0ce5479fd77dc3f1a5aad949e58cb4d9d7f7d1f829199bfdfdb21b1a517": "Too large. This one takes the process and leaves the machine standing.", "9f1d41ff0da0133e4b2202d979e4925c8b645fbf6cac5dd103916d8c829ada50": "Too large. This one takes the process and leaves the machine standing.", "c0bb85fa6f15b87331f688076a6b220ca481eb66f4da3707714d9d2eed16d0a6": "That one is ordinary, and the kernel forgives it. This one it does not.", "5b353adeeee9b6f139f42d500af8df0d32d23a05142672373308d0342a573311": "That one keeps what it should return. This one takes what was never offered.", "5f537b80f1f2b7d1cc179dba8d36aa88463eda6ac11cb8e60a4583e1bd16aa3c": "That one keeps what it should return. This one takes what was never offered.", "1cb504e95649943464ceec91c3de6444e2091888396c0da0c0d02d0fb6254ab5": "Close. That is a way of reaching the address. The archive asked for the refusal.", "d993138b74c57c707c3ec87fd6bbcff911b15a40387d5934dcad73434d7a6b1e": "Close. That is a way of reaching the address. The archive asked for the refusal.", "f9616a9f3b79611e8290ee5e06edd60030146b225bb7bb22639cf42b319f2ee2": "Close. That is a way of reaching the address. The archive asked for the refusal.", "a3ac6bfdea0ae0ce032001f9097c787142c03d3955a0262da9c11786c7280f15": "The cause, stated politely. Name what the system says back.", "e31f2c3c203e589cf1cffe2445b76a402496ce249bb106300e49b21dd60b9537": "The cause, stated politely. Name what the system says back.", "eed2cf0756a1e4c63ada8dbd6d854012b51e993abd4a15d3b340ff1e1f5b23ca": "The cause, stated politely. Name what the system says back.", "455605b9e563b7fe5c83495646d7913f963f8ada07441caf2727446c7e2482da": "The country it lives in. Name the fault itself.", "4e798a411ff0b866c71a26be4ebff3d6d030cc80addaf84acac638e037592ea5": "The country it lives in. Name the fault itself.", "ece134c3f8737a954710c0b89a9f70e8e59359f6a8ab4c19ae77cf1203d5c5bc": "The country it lives in. Name the fault itself."};
+        const S2_PASS = {"daa2417a789aef2dcbe31441960d660d275258f240aba3912e02a18e42c14095": "daa2417a", "3fd07d7b4ee9ae634cc2c37a5b541586fc5c245132cc2242e35770063651289e": "daa2417a", "fbfb7e62a2c0571ca4911a3c32e6ba6c63cd683378347e603959f3a2d7bc9c8c": "daa2417a", "8d983171701a4b55c781eb66288785889092d9f95949af04eeb81321c45abdc3": "daa2417a", "4f4087a936bf894552a7fd0aee46fd78984680bc7a8bd524d8ff00ae2116f850": "daa2417a", "7cfd2af28914475d0dfe6684bd84b8bd2633853ff7e8e21aa51547537594b52e": "daa2417a", "9ea90488b5c8219acc0b2eb36f115242abdbc865d061c24f2c8dfc0c9b57efab": "daa2417a"};
+        const S2_NEAR = {"c84e9bbecb4337cc165699ab194ac5daf827a186a9677eaa4d1915ef55c15861": "That is the man, and the machine he used. The archive asked for the question.", "77ed06f7738b2dcbbe9b7317d9d2df8763ef8a0a088a9151381b6c430fe95d84": "That is the man, and the machine he used. The archive asked for the question.", "f61015d127a3674b47e8d751c20cab2a500508f836f2fe38f0bb6e0f6fb6feaa": "That is the man, and the machine he used. The archive asked for the question.", "ad2254218def758399ab217072b71cfb5f2c318efe45c6ceeae1d49e259c1a28": "That is the man, and the machine he used. The archive asked for the question.", "470ff5f7a72649b9511814404fc018614c0801bf6523f1540af6311ae8b931e2": "Close, and older. That one asked about proofs. This one asks about stopping.", "86ae35d58a6aa3b5742df94ef9d7162219f0106a911ae1954c1f0604aaec805d": "Close, and older. That one asked about proofs. This one asks about stopping.", "941b20ea7d3e84aac1f6c49d1a5232651974363789fabb240a9f6952a36af6f9": "Close, and older. That one asked about proofs. This one asks about stopping.", "0a2f133eb9f7ca028a20aa3fcd7f6cb8a05a0e89c166e69e2fbd480a00be447d": "A different open question, and that one is still open. This one was closed.", "4bc80909292eead150985c36c1b853b8400fe8537cb791ba3030424de468734f": "A different open question, and that one is still open. This one was closed.", "a612d36314ef4cf5305fb8a0d6c673c9cf4c04e45a929554c055e509b76a4982": "A different open question, and that one is still open. This one was closed.", "ce52b7da492a2713f8617e7ba30332e3a9ba20832a15b8aed3239972114c2b1e": "The neighbouring result, five years earlier. Proofs, not programs.", "40fdbe101e27bcb88e5c0fee4bd90eb4d1c2234d858e97e9ba7544241d3fd46c": "The neighbouring result, five years earlier. Proofs, not programs.", "d5cbe43fd556d62f94e1dd494c3b3a748e0c27e04bd9d52962241fa061a88170": "The neighbouring result, five years earlier. Proofs, not programs.", "704b7acbacf9cd963218680c4709da2bff5a4020a234f835bb84f454275b1376": "That is what it cannot promise to detect. Name the question.", "6d3ef731ea467c7ea7df9e5aed0ac5c1b46b5bbc494efee7554ca4d347361ae3": "That is what it cannot promise to detect. Name the question.", "254637f72efcddb6a545bccbd0c3bb84e6393647deb5fd344de6584ccc1e743c": "That is what it cannot promise to detect. Name the question.", "cac1ed1c2be9d31c21f6dd807315da354a32058eacfeaccf16343bfd129df472": "That is what it cannot promise to detect. Name the question.", "91f30934bc09ccc82ca215955da88acfc1f3d82759438b69e480b7ed08d32e57": "That is the category of the answer. The archive asked for the name of the question.", "016038bd13491eccc40fc49ff8e1bfaaef47f8d806a5878f312fd5a391f33edf": "That is the category of the answer. The archive asked for the name of the question.", "743264daaa71ceb650f2a9a2ec6ad2fcbf98a5f27c4d73064c78af89f2468f41": "That is the category of the answer. The archive asked for the name of the question.", "18f964b717a476182dd577c3589e17d140280bc59d3ac038faf6e5d5678a560f": "That is the category of the answer. The archive asked for the name of the question.", "71da248c6049134707691aa231922056ffaf061cdd2513420d945d478f5033db": "Its stranger cousin. Not this one.", "c9580b611d5c19cb5c99e87f98141524c8ed191016fd92fc5dfb07ae5a12cade": "Its stranger cousin. Not this one.", "09a0845b88aee7df02062295a5e300eea8cb6d796ddefa1195560e444af4a09d": "The device in the proof, not the question it proves.", "21ce078705d04ca6324c1d0313fc08ea99f3cef6389a6744d40bd2d9d0cd7816": "The device in the proof, not the question it proves.", "8a1734233934061916569ef2650bd283ae3b90bbf67b2bfb60c03dcaa6e86b25": "The device in the proof, not the question it proves.", "badb8f127e03a5f5c6357214c2f7d5ed81dac20bb0db6a72da03a88cb0a6ad4d": "The thesis beside it. That one says what computing is. This one asks whether it ends.", "554e79e652b29f3a01dcf98e494b9928a1dc12cc83b83e730574c9b37ca6359f": "The thesis beside it. That one says what computing is. This one asks whether it ends.", "b9b0c8b0983718d66cc018a200be844e3e3ef704cae078ba6b39705c90b193c8": "The thesis beside it. That one says what computing is. This one asks whether it ends.", "4f6c0efa1a0f9935d690952daeb37c167e7732678bd34eca7503833ca53893ea": "A condition, not a question. The archive asked for the question.", "b3ca7f9bca0cda9404a21ff643b3045f5013446388d7840d5231237ea0a2aa21": "A condition, not a question. The archive asked for the question.", "e3ccbe1f95156325c612c031c18c66e0acae229edafa3e27aabb202486614043": "A condition, not a question. The archive asked for the question.", "12dd9774cc96e18b5b1b5d4a4b1e0724c4b3e3f37a3eed1af6a1dac7cfdbc3e3": "A condition, not a question. The archive asked for the question."};
+        const NOTES = ["The archive notes the attempt.", "The archive notes the attempt. It is patient.", "The archive has stopped counting. You have not."];
+        const frags = {};
+        async function digest(text) {
+          const data = new TextEncoder().encode(text);
+          const hash = await crypto.subtle.digest("SHA-256", data);
+          return Array.from(new Uint8Array(hash), (b) => b.toString(16).padStart(2, "0")).join("");
+        }
+        function base(text) {
+          return text.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().trim()
+            .replace(/[.!?]+$/, "").replace(/-/g, " ").replace(/\s+/g, " ").trim();
+        }
+        function stage1Forms(text) {
+          const t = base(text).replace(/^(the|a|an) /, "");
+          return [t.replace(/\s+/g, "")];
+        }
+        function stage2Forms(text) {
+          const t = base(text);
+          return [...new Set([...t.split(" "), t.replace(/\s+/g, "")])].filter(Boolean);
+        }
+        function ladder(state, verdict, hintA, hintB, nearText) {
+          if (nearText) {
+            state.near += 1;
+            verdict.textContent = nearText;
+            if (state.near >= 2) hintA.hidden = false;
+            if (state.near >= 4) hintB.hidden = false;
+            return;
+          }
+          state.wrong += 1;
+          verdict.textContent = NOTES[Math.min(state.wrong, NOTES.length) - 1];
+          if (state.wrong >= 2) hintA.hidden = false;
+          if (state.wrong >= 4) hintB.hidden = false;
+        }
+        async function check(forms, pass, near) {
+          const digests = await Promise.all(forms.map(digest));
+          for (const d of digests) if (pass[d]) return { frag: pass[d] };
+          for (const d of digests) if (near[d]) return { near: near[d] };
+          return {};
+        }
+        const st1 = { wrong: 0, near: 0 }, st2 = { wrong: 0, near: 0 };
+        document.querySelector("#claim1").addEventListener("submit", async (event) => {
+          event.preventDefault();
+          const raw = document.querySelector("#key1").value;
+          if (!raw.trim()) return;
+          const r = await check(stage1Forms(raw), S1_PASS, S1_NEAR);
+          if (!r.frag) { ladder(st1, document.querySelector("#verdict1"), document.querySelector("#hint1a"), document.querySelector("#hint1b"), r.near); return; }
+          frags.one = r.frag;
+          document.querySelector("#verdict1").textContent = "";
+          document.querySelector("#claim1").hidden = true;
+          const s2 = document.querySelector("#stage2"); s2.hidden = false; s2.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+        document.querySelector("#claim2").addEventListener("submit", async (event) => {
+          event.preventDefault();
+          const raw = document.querySelector("#key2").value;
+          if (!raw.trim() || !frags.one) return;
+          const r = await check(stage2Forms(raw), S2_PASS, S2_NEAR);
+          if (!r.frag) { ladder(st2, document.querySelector("#verdict2"), document.querySelector("#hint2a"), document.querySelector("#hint2b"), r.near); return; }
+          const href = `/elias/${frags.one}${r.frag}.mp3`;
+          document.querySelector("#player").src = href;
+          document.querySelector("#download").href = href;
+          document.querySelector("#verdict2").textContent = "";
+          document.querySelector("#claim2").hidden = true;
+          const rel = document.querySelector("#release"); rel.hidden = false; rel.scrollIntoView({ behavior: "smooth", block: "nearest" });
+        });
+      })();
+    </script>
+  </body>
+</html>
